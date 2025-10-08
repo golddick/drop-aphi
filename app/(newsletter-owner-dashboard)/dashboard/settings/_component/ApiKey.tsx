@@ -1,0 +1,175 @@
+
+
+"use client";
+
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import useGetMembership from "@/lib/hooks/useGetMembership";
+import { toast } from "sonner";
+import { ICONS } from "@/lib/utils/icons";
+
+const ApiKey = () => {
+  const { data: membership } = useGetMembership();
+  const [apiKey, setApiKey] = useState("");
+  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
+  const [isTrial, setIsTrial] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchApiKey = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/api-key");
+      const json = await res.json();
+      
+      if (res.ok) {
+        setApiKey(json.apiKey);
+        setExpiresAt(new Date(json.expiresAt));
+        setIsTrial(json.isTrial || false);
+      } else {
+        if (res.status === 403) {
+          // Trial ended or subscription required
+          setApiKey("");
+          toast.error(json.error);
+        } else {
+          toast.error(json.error || "Failed to fetch API key");
+        }
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error fetching API key");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateOrRegenerate = async (regenerate = false) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/api-key?regenerate=${regenerate}`, {
+        method: "GET",
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        setApiKey(json.apiKey);
+        setExpiresAt(new Date(json.expiresAt));
+        setIsTrial(json.isTrial || false);
+        toast.success(regenerate ? "API Key regenerated!" : "API Key created!");
+      } else {
+        toast.error(json.error || "API Key request failed");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error creating API key");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(apiKey).then(() => {
+      toast.success("Copied to clipboard");
+    });
+  };
+
+  useEffect(() => {
+    fetchApiKey();
+  }, [membership?.plan]);
+
+  // Show different messages based on user status
+  const hasActiveSubscription = membership && membership.plan !== "FREE" && membership.subscriptionStatus === "ACTIVE";
+
+  return (
+    <div className="flex justify-center px-4">
+      <Card className="w-full max-w-2xl shadow-lg border rounded-lg bg-white">
+        <CardHeader>
+          <CardTitle className="text-xl md:text-2xl font-bold text-gray-800">
+            API Key Access
+          </CardTitle>
+          {isTrial && (
+            <div className="space-y-2">
+              <p className="text-sm text-orange-600 font-medium">
+                ⚠️ Trial API Key - Expires on: {expiresAt?.toLocaleDateString()}
+              </p>
+              <p className="text-xs text-orange-500">
+                You have 14 days of free API access. Upgrade to continue after trial ends.
+              </p>
+            </div>
+          )}
+          {!apiKey && !hasActiveSubscription && (
+            <p className="text-sm text-blue-600 font-medium">
+              Get started with a 14-day free trial API key!
+            </p>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-gray-500">
+            Use your API key to authenticate requests. Keep it safe and do not share it publicly.
+          </p>
+
+          <div className="bg-gray-100 p-3 rounded-lg border text-sm font-mono break-all">
+            {loading ? "Loading..." : apiKey || "No API Key yet"}
+          </div>
+
+          {expiresAt && (
+            <p className="text-sm text-gray-600">
+              Expires on: {expiresAt.toLocaleDateString()}
+              {isTrial && " (14-day trial)"}
+            </p>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 mt-4">
+            {apiKey && (
+              <Button
+                variant="outline"
+                onClick={handleCopy}
+                className="flex items-center justify-center gap-2"
+              >
+                {ICONS.copy}
+                Copy
+              </Button>
+            )}
+
+            {!apiKey ? (
+              <Button
+                onClick={() => handleGenerateOrRegenerate(false)}
+                className="flex items-center justify-center gap-2"
+              >
+                {ICONS.key}
+                Get Trial API Key
+              </Button>
+            ) : (
+              <Button
+                variant="secondary"
+                onClick={() => handleGenerateOrRegenerate(true)}
+                disabled={isTrial} // Disable regeneration for trial users
+                className="flex items-center justify-center gap-2"
+              >
+                {ICONS.regenerate}
+                Regenerate
+              </Button>
+            )}
+          </div>
+
+          {isTrial && (
+            <div className="space-y-2">
+              <p className="text-xs text-orange-600">
+                ⚠️ Regeneration is not available for trial keys. 
+              </p>
+              <p className="text-xs text-orange-600">
+                Upgrade to premium for full access and key management features.
+              </p>
+            </div>
+          )}
+
+          {!apiKey && hasActiveSubscription && (
+            <p className="text-xs text-blue-600">
+              You have an active subscription. Generate your premium API key.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ApiKey;

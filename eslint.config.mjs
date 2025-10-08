@@ -12,7 +12,15 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+      rules: {
+    '@typescript-eslint/no-require-imports': 'error',
+    '@typescript-eslint/no-unused-expressions': 'error', 
+    '@typescript-eslint/no-this-alias': 'error',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': 'warn',
+  },
     ignores: [
+      '**/generated/prisma/**',
       "node_modules/**",
       ".next/**",
       "out/**",
