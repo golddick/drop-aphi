@@ -29,12 +29,12 @@ export default function Providers({ children }: ProviderProps) {
       if (loading) return;
 
       // ✅ Redirect unauthenticated users (only after hydration)
-      if (!user) {
-        if (typeof window !== "undefined") {
-          router.replace("/auth");
-        }
-        return;
-      }
+      // if (!user) {
+      //   if (typeof window !== "undefined") {
+      //     router.replace("/auth");
+      //   }
+      //   return;
+      // }
 
       // ✅ Initialize Paystack only once
       if (!paystackInitialized) {
