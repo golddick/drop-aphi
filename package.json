@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
 "scripts": {
-  "dev": "node server.js",
-  "build": "prisma generate && next build",
-  "postinstall": "prisma generate",
-  "start": "NODE_ENV=production node server.js",
-  "lint": "eslint"
+    "dev": "prisma generate --data-proxy && next dev",
+    "build": "prisma generate --data-proxy && next build",
+    "postinstall": "prisma generate --data-proxy",
+    "start": "next start",
+    "vercel-build": "prisma generate --data-proxy && next build",
+    "lint": "eslint ."
 },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
