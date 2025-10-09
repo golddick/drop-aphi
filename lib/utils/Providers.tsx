@@ -18,22 +18,25 @@ export default function Providers({ children }: ProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading } = useAuthUser();
-  const [paystackInitialized, setPaystackInitialized] = useState(false);
-  const [checkingStatus, setCheckingStatus] = useState(true); // to handle loading state
 
-  // ✅ Always run hooks before any conditional return
+  const [paystackInitialized, setPaystackInitialized] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
+
+  // ✅ Unified app logic inside one effect
   useEffect(() => {
     const runAppLogic = async () => {
-      // Wait until auth finishes loading
+      // Don't run until auth is done
       if (loading) return;
 
-      // Redirect if user is not authenticated
+      // ✅ Redirect unauthenticated users (only after hydration)
       if (!user) {
-        router.push("/");
+        if (typeof window !== "undefined") {
+          router.replace("/");
+        }
         return;
       }
 
-      // Initialize Paystack once
+      // ✅ Initialize Paystack only once
       if (!paystackInitialized) {
         try {
           await addPaystack();
@@ -43,12 +46,12 @@ export default function Providers({ children }: ProviderProps) {
         }
       }
 
-      // Check membership terms
+      // ✅ Check membership/terms
       try {
         const membershipStatus = await getMembershipStatus();
         if (membershipStatus?.termsAccepted === false) {
           toast.error("Accept our terms and conditions to continue");
-          router.push("/legal");
+          router.replace("/legal");
         }
       } catch (error) {
         console.error("Failed to check membership status:", error);
@@ -57,15 +60,18 @@ export default function Providers({ children }: ProviderProps) {
       }
     };
 
-    runAppLogic();
+    // Run logic only when router is ready (prevents hydration error)
+    if (typeof window !== "undefined") {
+      runAppLogic();
+    }
   }, [user, loading, router, paystackInitialized]);
 
-  // ✅ Show loader while user or status is loading
+  // ✅ Prevent rendering until both auth + checks are done
   if (loading || checkingStatus) {
     return <Loader />;
   }
 
-  const shouldShowSidebar = pathname.startsWith("/dashboard");
+  const shouldShowSidebar = pathname?.startsWith("/dashboard");
 
   return (
     <NextUIProvider>
