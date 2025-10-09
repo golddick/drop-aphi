@@ -140,14 +140,9 @@
 
 
 
-
-/* ==============================
-   Tailwind 4 Base (Preflight)
-   ============================== */
-@import "tailwindcss";
-
-/* Optional animation library */
-@import "tw-animate-css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ==============================
    CSS Variables for Theme
