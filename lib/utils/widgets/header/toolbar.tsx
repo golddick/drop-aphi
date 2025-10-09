@@ -7,16 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 const Toolbar = () => {
-  const { user, loading } = useAuthUser();
+  const { user } = useAuthUser();
 
-  // ✅ Show loader while checking auth
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center">
-        <Loader className="animate-spin size-4 text-gray-600" />
-      </div>
-    );
-  }
+
 
   return (
     <>
