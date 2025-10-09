@@ -6,6 +6,11 @@
       "use": "@vercel/next"
     }
   ],
+  "functions": {
+    "app/**/*.js": {
+      "includeFiles": "lib/generated/prisma/**"
+    }
+  },
   "env": {
     "PRISMA_GENERATE": "true"
   }
