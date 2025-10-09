@@ -31,7 +31,7 @@ export default function Providers({ children }: ProviderProps) {
       // ✅ Redirect unauthenticated users (only after hydration)
       if (!user) {
         if (typeof window !== "undefined") {
-          router.replace("/");
+          router.replace("/auth");
         }
         return;
       }
@@ -66,10 +66,6 @@ export default function Providers({ children }: ProviderProps) {
     }
   }, [user, loading, router, paystackInitialized]);
 
-  // ✅ Prevent rendering until both auth + checks are done
-  if (loading || checkingStatus) {
-    return <Loader />;
-  }
 
   const shouldShowSidebar = pathname?.startsWith("/dashboard");
 

@@ -29,7 +29,7 @@ export default function SetNewPasswordPage() {
 
   const searchParams = useSearchParams()
   const router = useRouter()
-  const email = searchParams.get('email')
+  const email = searchParams.get('email') 
 
   useEffect(() => {
     if (!email) {
