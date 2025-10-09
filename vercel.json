@@ -6,9 +6,12 @@
       "use": "@vercel/next"
     }
   ],
-  "build": {
-    "env": {
-      "PRISMA_GENERATE": "true"
+  "env": {
+    "PRISMA_GENERATE": "true"
+  },
+  "functions": {
+    "api/**": {
+      "includeFiles": "lib/generated/prisma/**"
     }
   }
 }
