@@ -1,0 +1,762 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Plan {
+  FREE
+  LAUNCH
+  SCALE
+  ENTERPRISE
+}
+
+enum Role {
+  USER
+  NEWSLETTEROWNER
+  PLATFORMADMIN
+  SUPERADMIN
+  BLOGWRITER
+}
+
+enum PlanSubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+enum CampaignStatus {
+  ACTIVE
+  INACTIVE
+  ENDED
+}
+
+enum NotificationType {
+  EMAIL
+  SYSTEM
+  PUSH
+  SMS
+}
+
+enum NotificationCategory {
+  WELCOME
+  NEWSLETTER
+  NEW_BLOG
+  KYC_APPROVAL
+  FLAGGED
+  FLAGGED_RESOLVED
+}
+
+enum NotificationStatus {
+  DRAFT
+  PENDING
+  SENDING
+  SENT
+  DELIVERED
+  FAILED
+  READ
+}
+
+enum NotificationPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SCHEDULED
+}
+
+enum FlagStatus {
+  FLAGGED
+  RESOLVED
+}
+
+enum PostVisibility {
+  PUBLIC
+  PRIVATE
+  MEMBERS_ONLY
+}
+
+enum ContentFormat {
+  MARKDOWN
+  HTML
+  RICH_TEXT
+}
+
+enum AIGenerationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  IN_PROGRESS
+}
+
+enum KYCAccountType {
+  INDIVIDUAL
+  ORGANIZATION
+}
+
+enum AccountType {
+  INDIVIDUAL
+  ORGANIZATION
+}
+
+enum KYCStatus {
+  PENDING
+  COMPLETED
+  REJECTED
+  APPROVED
+  IN_PROGRESS
+}
+
+enum EmailStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum EmailType {
+  BROADCAST
+  TRANSACTIONAL
+  NEWSLETTER
+  CAMPAIGN
+  AUTOMATION
+  TEST
+}
+
+enum ElementType {
+  TEXT
+  IMAGE
+  VIDEO
+  BUTTON
+  SOCIAL
+  DIVIDER
+  COLUMNS
+}
+
+enum RecipientStatus {
+  FAILED
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  UNSUBSCRIBED
+  COMPLAINED
+}
+
+model User {
+  id                           String                 @id @default(uuid())
+  userId                       String                 @unique
+  email                        String                 @unique
+  fullName                     String
+  userName                     String
+  password                     String
+  imageUrl                     String?
+  paystackCustomerId           String?
+  paystackSubscriptionId       String?
+  plan                         Plan                   @default(FREE)
+  role                         Role                   @default(USER)
+  subscriptionStatus           PlanSubscriptionStatus @default(INACTIVE)
+  accType                      AccountType            @default(INDIVIDUAL)
+  currentPeriodEnd             DateTime?
+  organization                 String?
+  website                      String?
+  kycStatus                    KYCStatus              @default(PENDING)
+  SenderName                   String?
+  amount                       Int                    @default(0)
+  currency                     String                 @default("NGN")
+  lastPaymentDate              DateTime?
+  nextPaymentDate              DateTime?
+  successfulPayments           Int                    @default(0)
+  failedAttempts               Int                    @default(0)
+  subscriberLimit              Int                    @default(500)
+  emailLimit                   Int                    @default(20)
+  blogPostLimit                Int                    @default(10)
+  aiGenerationLimit            Int                    @default(5)
+  termsAndConditionsAccepted   Boolean                @default(false)
+  approvedKYC                  Boolean                @default(false)
+  isEmailVerified              Boolean                @default(false)
+  isLoggedIn                   Boolean                @default(false)
+  is2FAEnabled                 Boolean                @default(false)
+  createdAt                    DateTime               @default(now())
+  loggedInAt                   DateTime               @default(now())
+  updatedAt                    DateTime               @updatedAt
+  apiKeys                      ApiKey[]
+  aIContentGenerationToExcerpt BlogAIGeneration[]
+  blogComments                 BlogComment[]
+  blogPosts                    BlogPost[]
+  postViews                    BlogPostView[]
+  emails                       Email[]
+  flagedPosts                  FlagedBlogPost[]
+  invoices                     Invoice[]
+  kyc                          Kyc?
+  usage                        MembershipUsage[]
+  notificationEmails           EmailNotification[]
+  tokens                       RefreshToken[]
+  reportedComments             ReportedComment[]
+  template                     EmailTemplate[]
+
+  @@index([paystackCustomerId])
+  @@index([paystackSubscriptionId])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  jti       String   @unique
+  userId    String
+  hashed    String
+  userAgent String?
+  ip        String?
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String   @db.VarChar(255)
+  otp       String   @db.VarChar(255)
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@map("otps")
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  userId      String
+  description String
+  amount      Int
+  status      String
+  invoiceUrl  String
+  date        DateTime @default(now())
+  externalId  String?
+  user        User     @relation(fields: [userId], references: [userId])
+}
+
+model ThirdPartyOTP {
+  email     String   @id
+  code      String
+  otpType   String
+  expiresAt DateTime
+  createdBy String
+  createdAt DateTime @default(now())
+  attempts  Int      @default(0)
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  keyHash   String   @unique
+  jwt       String
+  createdAt DateTime @default(now())
+  isTrial   Boolean  @default(false)
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [userId])
+}
+
+model Kyc {
+  id               String         @id @default(cuid())
+  userId           String         @unique
+  accountType      KYCAccountType
+  status           KYCStatus      @default(PENDING)
+  levels           Json
+  documents        Json
+  livePhoto        String?
+  reviewedTime     DateTime?
+  reviewedBy       String?
+  rejectedResponse String?
+  comments         String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  user             User           @relation(fields: [userId], references: [userId])
+  kycDocuments     KYCDocument[]
+}
+
+model KYCDocument {
+  id         String   @id @default(cuid())
+  kycId      String
+  type       String
+  url        String
+  key        String
+  uploadedAt DateTime @default(now())
+  kyc        Kyc      @relation(fields: [kycId], references: [id])
+}
+
+model MembershipUsage {
+  id                String   @id @default(uuid())
+  userId            String
+  month             String
+  emailsSent        Int      @default(0)
+  subscribersAdded  Int      @default(0)
+  campaignsCreated  Int      @default(0)
+  blogPostsCreated  Int      @default(0)
+  aiGenerationsUsed Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, month], name: "userId_month")
+  @@index([userId])
+  @@index([month])
+}
+
+model BlogPost {
+  id             String            @id @default(uuid())
+  title          String
+  subtitle       String?
+  slug           String            @unique
+  content        String
+  excerpt        String?
+  format         ContentFormat     @default(MARKDOWN)
+  status         PostStatus        @default(DRAFT)
+  visibility     PostVisibility    @default(PUBLIC)
+  featuredImage  String
+  featuredVideo  String?
+  galleryImages  String[]
+  authorId       String
+  authorBio      String
+  authorTitle    String
+  author         String
+  categoryId     String?
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String[]
+  seoScore       Int               @default(0)
+  shares         Int               @default(0)
+  readTime       Int               @default(0)
+  wordCount      Int               @default(0)
+  characterCount Int               @default(0)
+  likes          Int               @default(0)
+  views          Int               @default(0)
+  flagReason     String?
+  isFlagged      Boolean           @default(false)
+  isFeatured     Boolean           @default(false)
+  isPinned       Boolean           @default(false)
+  allowComments  Boolean           @default(true)
+  publishedAt    DateTime?
+  flaggedAt      DateTime?
+  scheduledAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  generatedById  String?
+  comments       BlogComment[]
+  user           User              @relation(fields: [authorId], references: [userId])
+  category       BlogCategory?     @relation(fields: [categoryId], references: [id])
+  aiGeneration   BlogAIGeneration? @relation("AIContentGenerationToExcerpt", fields: [generatedById], references: [id])
+  viewsCount     BlogPostView[]
+  flaggedPosts   FlagedBlogPost[]
+  tags           BlogTag[]         @relation("BlogPostToBlogTag")
+
+  @@index([authorId])
+  @@index([status])
+  @@index([visibility])
+  @@index([publishedAt])
+  @@index([slug])
+}
+
+model FlagedBlogPost {
+  id         String     @id @default(cuid())
+  reason     String
+  comment    String
+  flaggedBy  String
+  status     FlagStatus @default(FLAGGED)
+  createdAt  DateTime   @default(now())
+  reviewedAt DateTime?
+  postId     String
+  userId     String
+  post       BlogPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+}
+
+model BlogPostView {
+  id           String   @id @default(cuid())
+  postId       String
+  userId       String?
+  externalName String?
+  createdAt    DateTime @default(now())
+  post         BlogPost @relation(fields: [postId], references: [id])
+  user         User?    @relation(fields: [userId], references: [userId])
+
+  @@unique([postId, userId, externalName])
+}
+
+model BlogCategory {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  posts       BlogPost[]
+}
+
+model BlogTag {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  posts     BlogPost[] @relation("BlogPostToBlogTag")
+}
+
+model BlogComment {
+  id               String            @id @default(uuid())
+  content          String
+  authorId         String
+  postId           String
+  userId           String?
+  parentId         String?
+  externalName     String?
+  externalAvatar   String?
+  likes            Int               @default(0)
+  status           String            @default("approved")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [authorId], references: [userId])
+  parent           BlogComment?      @relation("CommentToComment", fields: [parentId], references: [id])
+  replies          BlogComment[]     @relation("CommentToComment")
+  post             BlogPost          @relation(fields: [postId], references: [id])
+  reportedComments ReportedComment[]
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([status])
+}
+
+model ReportedComment {
+  id              String      @id @default(cuid())
+  commentId       String
+  blogSlug        String
+  blogOwner       String
+  parentCommentBy String
+  reportedBy      String
+  reason          String?
+  reportedAt      DateTime    @default(now())
+  resolved        Boolean     @default(false)
+  comment         BlogComment @relation(fields: [commentId], references: [id])
+  user            User        @relation(fields: [reportedBy], references: [userId])
+}
+
+model BlogAIGeneration {
+  id          String             @id @default(uuid())
+  prompt      String
+  parameters  Json?
+  status      AIGenerationStatus @default(COMPLETED)
+  output      String
+  format      ContentFormat      @default(MARKDOWN)
+  cost        Float?
+  tokensUsed  Int?
+  model       String?
+  userId      String
+  createdAt   DateTime           @default(now())
+  completedAt DateTime?
+  user        User               @relation(fields: [userId], references: [userId])
+  blogPosts   BlogPost[]         @relation("AIContentGenerationToExcerpt")
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Campaign {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  userId      String
+  description String?
+  type        String?
+  status      CampaignStatus @default(ACTIVE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  emailsSent  Int            @default(0)
+  recipients  Int?           @default(0)
+  openRate    Float?         @map("open_rate")
+  clickRate   Float?         @map("click_rate")
+  lastSentAt  DateTime?      @map("last_sent_at")
+  emails      Email[]
+
+  @@index([status])
+}
+
+model Subscriber {
+  id                String             @id @default(cuid())
+  email             String
+  name              String?
+  newsLetterOwnerId String
+  source            String             @default("unknown")
+  status            SubscriptionStatus @default(SUBSCRIBED)
+  campaignId        String?
+  pageUrl           String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([email, newsLetterOwnerId], name: "unique_subscriber_key")
+}
+
+model EmailNotification {
+  id                           String                         @id @default(uuid())
+  type                         NotificationType
+  category                     NotificationCategory
+  title                        String
+  content                      Json
+  textContent                  String?
+  htmlContent                  String?
+  status                       NotificationStatus             @default(PENDING)
+  priority                     NotificationPriority           @default(MEDIUM)
+  userId                       String
+  emailsSentCount              Int?                           @default(0)
+  openCount                    Int?                           @default(0)
+  clickCount                   Int?                           @default(0)
+  recipients                   Int?                           @default(0)
+  bounceCount                  Int?                           @default(0)
+  openedByEmails               String[]                       @default([])
+  clickedByEmails              String[]                       @default([])
+  lastOpened                   DateTime?
+  lastClicked                  DateTime?
+  metadata                     Json?
+  sentAt                       DateTime?
+  createdAt                    DateTime                       @default(now())
+  updatedAt                    DateTime                       @updatedAt
+  read                         Boolean                        @default(false)
+  user                         User                           @relation(fields: [userId], references: [userId])
+  NotificationEmailClickedLink NotificationEmailClickedLink[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([category])
+}
+
+model ClickedLink {
+  id        String   @id @default(uuid())
+  emailId   String
+  url       String
+  clickedAt DateTime @default(now())
+  clickedBy String?
+  email     Email    @relation(fields: [emailId], references: [id])
+
+  @@index([emailId])
+}
+
+model NotificationEmailClickedLink {
+  id                  String             @id @default(uuid())
+  notificationEmailId String?
+  url                 String
+  clickedAt           DateTime           @default(now())
+  clickedBy           String?
+  notificationEmail   EmailNotification? @relation(fields: [notificationEmailId], references: [id])
+
+  @@index([notificationEmailId])
+}
+
+model Email {
+  // Primary Key
+  id String @id @default(uuid())
+
+  // Content Fields from the Mail Studio
+  title        String  @unique
+  content      String // Final generated HTML
+  emailSubject String
+  previewText  String?
+  builderMode  String  @default("drag-drop") // 'drag-drop' or 'code'
+
+  // Mail Studio Builder Data
+  builderData  Json? // Stores the complete email state from MailStudio
+  elements     EmailElement[] // Individual elements for querying
+  templateUsed String? // Template identifier if used
+
+  // Status & Tracking
+  status            EmailStatus @default(DRAFT)
+  emailType         EmailType   @default(NEWSLETTER)
+  trackOpens        Boolean     @default(true)
+  trackClicks       Boolean     @default(true)
+  enableUnsubscribe Boolean     @default(true)
+
+  // Scheduling
+  scheduleDate DateTime?
+  scheduleTime String?
+
+  // Delivery Statistics
+  emailsSentCount Int @default(0)
+  recipients      Int @default(0)
+  bounceCount     Int @default(0)
+  openCount       Int @default(0)
+  clickCount      Int @default(0)
+
+  // Timing Information
+  sentAt      DateTime?
+  lastOpened  DateTime?
+  lastClicked DateTime?
+
+  // Tracking Arrays
+  openedByIps     String[] @default([])
+  openedByEmails  String[] @default([])
+  clickedByIps    String[] @default([])
+  clickedByEmails String[] @default([])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId            String
+  newsLetterOwnerId String
+  campaignId        String?
+  messageId         String?
+
+  // Foreign Key Relations
+  user     User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  campaign Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  // Related Models
+  clickedLinks     ClickedLink[]
+  emailAttachments EmailAttachment[]
+  emailRecipients  EmailRecipient[]
+  template         EmailTemplate?    @relation(fields: [templateUsed], references: [id], onDelete: SetNull)
+  emailAnalytics   EmailAnalytics?
+
+  @@unique([messageId])
+  // Indexes for better performance
+  @@index([userId])
+  @@index([campaignId])
+  @@index([status])
+  @@index([emailType])
+  @@index([sentAt])
+  @@index([scheduleDate])
+}
+
+// Stores individual email elements from the Mail Studio builder
+model EmailElement {
+  id         String      @id @default(uuid())
+  emailId    String
+  elementId  String // Unique ID from the Mail Studio (e.g., "text-123456789")
+  type       ElementType
+  content    String? // Text content for text/button elements
+  properties Json // Stores all element properties as JSON
+  sortOrder  Int // Order in the email layout
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@unique([emailId, elementId])
+  @@index([emailId])
+  @@index([type])
+  @@index([sortOrder])
+}
+
+// Template system for Mail Studio
+model EmailTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  thumbnail   String? // URL to template preview image
+  category    String // Basics, Layout, Media, etc.
+  tags        String[]
+  elements    Json // Array of EmailElement data
+  subject     String // Default subject
+  isPublic    Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  usageCount  Int      @default(0)
+  userId      String? // Null for system templates
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User?   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  emails Email[] // Emails created from this template
+
+  @@index([userId])
+  @@index([category])
+  @@index([isPublic])
+  @@index([isFeatured])
+}
+
+model EmailAttachment {
+  id        String   @id @default(uuid())
+  emailId   String
+  filename  String
+  fileSize  Int // in bytes
+  mimeType  String
+  url       String // Storage URL
+  createdAt DateTime @default(now())
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+}
+
+model EmailRecipient {
+  id             String          @id @default(uuid())
+  emailId        String
+  recipientEmail String
+  status         RecipientStatus @default(PENDING)
+  sentAt         DateTime?
+  deliveredAt    DateTime?
+  openedAt       DateTime?
+  clickedAt      DateTime?
+  bouncedAt      DateTime?
+  bounceReason   String?
+  unsubscribeAt  DateTime?
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@unique([emailId, recipientEmail])
+  @@index([emailId])
+  @@index([recipientEmail])
+  @@index([status])
+}
+
+model EmailAnalytics {
+  id               String @id @default(uuid())
+  emailId          String @unique
+  totalOpens       Int    @default(0)
+  deliveredCount   Int    @default(0)
+  totalRecipients  Int    @default(0)
+  uniqueOpens      Int    @default(0)
+  totalClicks      Int    @default(0)
+  uniqueClicks     Int    @default(0)
+  deliveryRate     Float  @default(0.0)
+  openRate         Float  @default(0.0)
+  clickRate        Float  @default(0.0)
+  bounceRate       Float  @default(0.0)
+  unsubscribeCount Int    @default(0)
+  spamReportCount  Int    @default(0)
+  forwardCount     Int    @default(0)
+  deviceBreakdown  Json? // { mobile: number, desktop: number, tablet: number }
+  locationData     Json? // Geographic distribution
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+}
