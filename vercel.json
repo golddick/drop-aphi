@@ -4,7 +4,7 @@
   "installCommand": "npm install",
   "functions": {
     "app/**/*.js": {
-      "includeFiles": "node_modules/.prisma/client/**"
+      "includeFiles": "lib/generated/prisma/**"
     }
   }
 }
