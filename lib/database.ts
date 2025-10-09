@@ -1,77 +1,43 @@
 import { PrismaClient } from "./generated/prisma";
 
-// Type-safe global Prisma instance
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+// Type-safe global Prisma instance (prevents multiple clients in dev)
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClient;
 };
 
-function createPrismaClient(): PrismaClient {
-  const client = new PrismaClient({
-    // Optimized logs for serverless
-    log: process.env.NODE_ENV === "development" 
-      ? ["query", "error", "warn"] 
-      : ["error"],
-    
-    // Better error handling for production
+// Create a new Prisma client
+function createPrismaClient() {
+  return new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
     errorFormat: "minimal",
-    
-    // Connection timeout for serverless environments
-    ...(process.env.VERCEL || process.env.NODE_ENV === "production") && {
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL,
-        },
-      },
-    },
+    ...(process.env.DATABASE_URL && {
+      datasources: { db: { url: process.env.DATABASE_URL } },
+    }),
   });
-
-  // Add graceful shutdown for non-serverless environments
-  if (typeof process !== 'undefined') {
-    const signals = ['SIGINT', 'SIGTERM', 'SIGHUP'] as const;
-    signals.forEach(signal => {
-      process.on(signal, async () => {
-        await client.$disconnect();
-        process.exit(0);
-      });
-    });
-  }
-
-  return client;
 }
 
+// Use cached client in dev to avoid creating multiple instances
 export const database = globalForPrisma.prisma ?? createPrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = database;
 
-// Only cache in development to prevent memory leaks in serverless
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = database;
-}
-
-// Enhanced health check for serverless
+// Simple health check
 export async function checkDatabaseConnection(): Promise<boolean> {
   try {
-    // Fast timeout for serverless functions
-    await Promise.race([
-      database.$queryRaw`SELECT 1`,
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 3000)
-      )
-    ]);
+    await database.$queryRaw`SELECT 1`;
     console.log("✅ Database connection healthy");
     return true;
-  } catch (error) {
-    console.error("❌ Database connection failed:", error);
+  } catch (err) {
+    console.error("❌ Database connection failed:", err);
     return false;
   }
 }
 
-// Connection management for different environments
-export async function withDatabase<T>(
-  operation: (db: PrismaClient) => Promise<T>
-): Promise<T> {
+// Helper for safe operations
+export async function withDatabase<T>(operation: (db: PrismaClient) => Promise<T>): Promise<T> {
   try {
     return await operation(database);
-  } catch (error) {
-    console.error('Database operation failed:', error);
-    throw error;
+  } catch (err) {
+    console.error("Database operation failed:", err);
+    throw err;
   }
 }

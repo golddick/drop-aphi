@@ -6,7 +6,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+import * as XLSX from "sheetjs-style";
 
 interface ImportStatus {
   success: boolean;
