@@ -8,7 +8,9 @@
   ],
   "functions": {
     "api/**": {
-      "includeFiles": "lib/generated/prisma/**"
+      "includeFiles": [
+        "lib/generated/prisma/**"
+      ]
     }
   },
   "env": {
