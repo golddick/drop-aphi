@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { CreditCard, Download, Calendar, Zap, Check, AlertTriangle, Plus, Edit, Trash2 } from "lucide-react"
+import {  Download, Calendar, Zap, Check, AlertTriangle } from "lucide-react"
 
 import { cancelSubscription, downgradeToFreePlan, getBillingHistory, getCurrentSubscription, getUsageStats, toggleAutoRenew } from "@/actions/plan/subscription-plan"
 import { availablePlans } from "@/lib/planLimit"

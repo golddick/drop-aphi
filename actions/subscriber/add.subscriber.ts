@@ -49,7 +49,7 @@ export const addSubscriber = async ({
     // 3. Get platform name and URL
     const owner = await database.user.findUnique({ where: { userId: userID } })
     const platformName = owner?.SenderName || owner?.userName || 'Drop-aphi'
-    const platformUrl = owner?.organizationUrl || undefined
+    const platformUrl = owner?.website || undefined
 
     // 4. Validate email with ZeroBounce
     const validation = await validateEmail({ email })

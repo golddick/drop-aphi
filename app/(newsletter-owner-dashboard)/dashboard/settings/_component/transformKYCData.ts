@@ -16,7 +16,6 @@ export const transformKYCData = (kycStatus: any) => {
       return typeof level === 'string' ? JSON.parse(level) : level;
     };
 
-    const level1 = parseLevel(kycStatus.levels?.level1);
     const level2 = parseLevel(kycStatus.levels?.level2);
     const level3 = parseLevel(kycStatus.levels?.level3);
 

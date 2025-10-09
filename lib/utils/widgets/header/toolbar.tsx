@@ -10,9 +10,15 @@ const Toolbar = () => {
 
    const { user,loading } = useAuthUser();
 
-  if (!user || loading) {
-    return <div> <Loader className=" animate-spin size-4 "/></div>
-  }
+if (loading) {
+  return (
+    <div className="flex items-center justify-center">
+      <Loader className="animate-spin size-4" />
+    </div>
+  );
+}
+
+
   return (
     <>
      

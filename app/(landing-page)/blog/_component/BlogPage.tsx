@@ -3,7 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { getBlogPost, getRelatedPosts } from '@/actions/blog/get.blog';
 import Loader from '@/components/_component/Loader';
 import Header from '@/lib/utils/widgets/header';
@@ -16,15 +16,7 @@ interface BlogPostPageProps {
 
 }
 
-interface PostData {
-  id: string;
-  title: string;
-  content: string;
-  // ... other post fields
-}
-
 export default function BlogPostPage({ slug }: BlogPostPageProps) {
-  const router = useRouter();
   const [post, setPost] = useState<any | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

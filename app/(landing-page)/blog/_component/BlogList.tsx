@@ -39,15 +39,13 @@ type BlogPost = {
   category?: {
     id: string;
     name: string;
-    slug: string;
     description?: string | null;
   } | null;
   tags: {
     id: string;
     name: string;
-    slug: string;
   }[];
-  membership: {
+  user: {
     id: string;
     userId: string;
     email: string;
@@ -64,7 +62,7 @@ export function BlogList() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [categories, setCategories] = useState<{name: string, slug: string}[]>([])
+  const [categories, setCategories] = useState<{name: string}[]>([])
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -178,8 +176,8 @@ export function BlogList() {
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map(category => (
                 <SelectItem 
-                  key={category.slug} 
-                  value={category.slug}
+                  key={category.name} 
+                  value={category.name}
                 >
                   {category.name}
                 </SelectItem>
@@ -239,13 +237,13 @@ export function BlogList() {
                   <div className="flex items-center gap-4 text-sm text-neutral-500 mb-2">
                     <div className="flex items-center gap-2">
                       <Image
-                        src={post.membership?.imageUrl || "/logo.jpg"}
-                        alt={post.membership?.userName || "Author"}
+                        src={post.user?.imageUrl || "/logo.jpg"}
+                        alt={post.user?.userName || "Author"}
                         width={24}
                         height={24}
                         className="rounded-full"
                       />
-                      <span>{post.membership?.fullName || "Unknown Author"}</span>
+                      <span>{post.user?.fullName || "Unknown Author"}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />

@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { database } from "@/lib/database";
 import { getAuthCookies } from "./cookie";
@@ -23,8 +23,8 @@ export async function getServerAuth() {
           userName: user.userName ?? null, 
           imageUrl: user.imageUrl ?? null 
         };
-      } catch (accessError: any) {
-        if (accessError.name === "TokenExpiredError") {
+      } catch (accessError: unknown) {
+        if (accessError instanceof Error && accessError.name === "TokenExpiredError") {
           console.log("Access token expired");
           // Continue to refresh token logic
         } else {
@@ -101,8 +101,8 @@ export async function getServerAuth() {
         accType: user.accType,
       };
 
-      // Issue new access token
-      const newAccessToken = signAccessToken(jwtUser);
+      // Issue new access token (but don’t reuse here, handled elsewhere)
+      const _newAccessToken = signAccessToken(jwtUser);
 
       console.log("New access token issued for user:", user.id);
       
@@ -113,11 +113,15 @@ export async function getServerAuth() {
         imageUrl: user.imageUrl ?? null 
       };
 
-    } catch (refreshError: any) {
-      console.error("Refresh token invalid:", refreshError.message);
+    } catch (refreshError: unknown) {
+      if (refreshError instanceof Error) {
+        console.error("Refresh token invalid:", refreshError.message);
+      } else {
+        console.error("Refresh token invalid:", refreshError);
+      }
       return null;
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Server auth error:", error);
     return null;
   }
@@ -190,7 +194,7 @@ export async function refreshAuthTokens() {
     const newAccessToken = signAccessToken(jwtUser);
 
     // Set new cookies
-    const { setAuthCookies } = await import('./cookie');
+    const { setAuthCookies } = await import("./cookie");
     await setAuthCookies({ 
       accessToken: newAccessToken, 
       refreshToken 
@@ -202,8 +206,12 @@ export async function refreshAuthTokens() {
       accessToken: newAccessToken 
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Token refresh error:", error.message);
+      return { success: false, error: error.message };
+    }
     console.error("Token refresh error:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: "Unknown error" };
   }
 }

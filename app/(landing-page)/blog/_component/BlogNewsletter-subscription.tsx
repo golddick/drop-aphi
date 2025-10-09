@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Mail, CheckCircle, Sparkles, TrendingUp, Bell, Gift } from "lucide-react"
+import { Mail, CheckCircle } from "lucide-react"
 import { formatString } from "@/lib/utils"
-import { useSearchParams } from "next/navigation"
 import { addSubscriber } from "@/actions/subscriber/add.subscriber"
 import { getMembership } from "@/actions/membership/getMembership"
 import { toast } from "sonner"
@@ -91,12 +90,6 @@ export function NewsletterSubscription({
     }
   }
 
-  const benefits = [
-    { icon: TrendingUp, text: "Weekly AI & Tech insights" },
-    { icon: Bell, text: "Breaking news alerts" },
-    { icon: Gift, text: "Exclusive content & resources" },
-    { icon: Sparkles, text: "Expert analysis & predictions" },
-  ]
 
   if (isSubscribed) {
     return (

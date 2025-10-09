@@ -3,7 +3,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import Image from "next/image"
 import {
   Shield,
   Upload,
@@ -16,8 +15,6 @@ import {
   Loader2,
   Camera,
   Building,
-  MapPin,
-  Plus,
   Edit,
   RotateCcw,
 } from "lucide-react"
@@ -38,6 +35,7 @@ import { KYCAccountType, KYCStatus } from "@/lib/generated/prisma"
 import { useAuthUser } from "@/lib/auth/getClientAuth"
 import { toast } from "sonner"
 import Loader from "@/components/_component/Loader"
+import Image from "next/image"
 
 interface KYCLevel {
   level: number
@@ -305,7 +303,7 @@ export default function KYCPage() {
         return `${docType}_${timestamp}.${ext}`.toLowerCase()
       }
 
-      let documents: { url: string; key: string; type: string }[] = []
+      const documents: { url: string; key: string; type: string }[] = []
 
       if (accountType === KYCAccountType.INDIVIDUAL) {
         if (!individualData.idFront && !individualData.existingIdFront) {
@@ -573,7 +571,7 @@ export default function KYCPage() {
         videoRef.current.srcObject = stream
       }
     } catch (error) {
-      toast.error("Unable to access camera. Please check permissions.")
+      toast.error(  error instanceof Error ? error.message : "Unable to access camera. Please check permissions.")
       setIsTakingPhoto(false)
     }
   }
@@ -638,17 +636,6 @@ export default function KYCPage() {
   const getOverallProgress = () => {
     const completedLevels = kycLevels.filter(level => level.status === KYCStatus.COMPLETED).length
     return (completedLevels / kycLevels.length) * 100
-  }
-
-  const handleAddressDocumentUpload = async (file: File) => {
-    try {
-      setLevel3Data({
-        ...level3Data,
-        addressDocument: file,
-      })
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to upload document")
-    }
   }
 
   const handleFileInputChange = (field: "idFront" | "idBack", file: File | null) => {
@@ -1666,22 +1653,24 @@ export default function KYCPage() {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   {capturedPhoto ? (
                     <div className="space-y-4">
-                      <div className="mx-auto w-48 h-48 bg-gray-100 rounded-lg overflow-hidden">
-                        <img
-                          src={capturedPhoto}
-                          alt="Captured live photo"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setCapturedPhoto(null)
-                          setLevel3Data({ ...level3Data, livePhoto: "" })
-                        }}
-                      >
-                        Retake Photo
-                      </Button>
+                      <div className="mx-auto w-48 h-48 bg-gray-100 rounded-lg overflow-hidden relative">
+                      <Image
+                        src={capturedPhoto}
+                        alt="Captured live photo"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setCapturedPhoto(null)
+                        setLevel3Data({ ...level3Data, livePhoto: "" })
+                      }}
+                    >
+                      Retake Photo
+                    </Button>
                     </div>
                   ) : isTakingPhoto ? (
                     <div className="space-y-4">

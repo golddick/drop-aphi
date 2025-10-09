@@ -1,5 +1,4 @@
 // lib/templates/newPostTemplate.ts
-import { formatString } from "@/lib/utils";
 
 interface NewPostTemplateParams {
   author: string;

@@ -7,14 +7,13 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { motion,  } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import Head from "next/head"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Calendar,
   Clock,
@@ -24,14 +23,11 @@ import {
   Linkedin,
   ChevronLeft,
   ChevronRight,
-  Send,
   Bookmark,
   BookmarkCheck,
-  Eye,
   Heart,
   Copy,
   Check,
-  Share2,
 } from "lucide-react"
 
 
@@ -52,7 +48,6 @@ import { toast } from "sonner"
 import { parseMarkdown } from "@/lib/blog/markdown-parser"
 
 export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
-  const [commentText, setCommentText] = useState("")
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [readingProgress, setReadingProgress] = useState(0)
@@ -83,7 +78,7 @@ export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
   });
 
   // Share functionality
-  const { links, open, webShare } = useShare({
+  const {  open } = useShare({
     url: typeof window !== 'undefined' ? window.location.href : '',
     title: post?.title || '',
     description: post?.subtitle || '',
@@ -105,13 +100,7 @@ export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const { scrollYProgress } = useScroll({
-    target: contentRef,
-    offset: ["start start", "end end"],
-  })
 
-  const headerY = useTransform(scrollYProgress, [0, 0.2], [0, -100])
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
 
   if (!post) {
     return (
@@ -137,7 +126,6 @@ export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
     authorTitle,
     createdAt,
     readTime,
-    views,
     likes,
     tags,
     subtitle,

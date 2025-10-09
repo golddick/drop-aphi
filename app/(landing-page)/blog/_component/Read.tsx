@@ -1,6 +1,7 @@
 import React from 'react'
 import { BlogPostReader } from './Read-Blog'
-import { BlogPostReaderProps } from '@/app/type'
+import { BlogPostReaderProps } from '@/type'
+
 
 
 

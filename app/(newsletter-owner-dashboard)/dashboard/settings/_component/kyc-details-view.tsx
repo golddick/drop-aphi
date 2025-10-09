@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,6 @@ import {
   Eye,
   Edit,
   RefreshCw,
-  CircleAlert,
 } from "lucide-react";
 import {
   Dialog,
@@ -93,11 +91,8 @@ interface KYCDetailsViewProps {
 }
 
 export function KYCDetailsView({ kycData, onEdit, onResubmit, isUpLoading }: KYCDetailsViewProps) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)");
 
-  console.log(kycData, 'kyc data c')
 
   const getStatusBadge = (status: KYCStatus) => {
     switch (status) {

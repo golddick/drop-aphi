@@ -1,5 +1,4 @@
 
-import * as nodemailer from 'nodemailer';
 import { database } from '../database';
 import { transporter } from './utils';
 
@@ -35,7 +34,6 @@ export const sendNotificationEmail = async (params: SendNotificationEmailParams)
     trackOpens = true,
     trackClicks = true,
     enableUnsubscribe = true,
-    isBulk = false,
   } = params;
 
   const domain = process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://thenews.africa';

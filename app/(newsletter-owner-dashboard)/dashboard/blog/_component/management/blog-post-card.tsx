@@ -16,32 +16,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Edit3,
   Eye,
   Trash2,
-  MoreVertical,
-  Calendar,
   Clock,
-  Users,
   Heart,
-  MessageSquare,
-  Copy,
-  Share2,
   Archive,
-  Globe,
-  Lock,
   Star,
   MoreHorizontal,
   Edit,
   ExternalLink,
   MessageCircle,
   Flag,
-  AlertTriangle,
 } from "lucide-react"
 import { BiWorld } from "react-icons/bi"
-
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatDate } from "@/lib/utils"
 import { PostStatus, PostVisibility } from "@/lib/generated/prisma"
 
@@ -115,7 +102,6 @@ export function BlogPostCard({
   onDelete,
   onPublishe,
   onArchive,
-  getStatusIcon,
   getStatusColor,
 }: BlogPostCardProps) {
   const [isHovered, setIsHovered] = useState(false)

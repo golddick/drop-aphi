@@ -147,7 +147,6 @@ export const sendEmail = async (params: SendEmailParams) => {
     campaign,
     fromApplication,
     newsLetterOwnerId,
-    contentJson,
     adminEmail,
     trackOpens = true,
     trackClicks = true,
@@ -156,12 +155,11 @@ export const sendEmail = async (params: SendEmailParams) => {
     builderData,
     elements = [],
     createTemplate = false,
-    templateName,
     userId,
     builderMode = 'visual',
   } = params;
 
-  const domain = 'https://denews-xi.vercel.app/';
+  const domain = process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://thenews.africa';
   const startTime = Date.now();
   const trackingId = `trk_${Date.now()}`;
 

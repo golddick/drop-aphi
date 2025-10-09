@@ -49,7 +49,6 @@ import {
   Film,
   ImagePlus,
   Bot,
-  Wand2,
   Hash,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -222,7 +221,6 @@ export function BlogWriteEditor() {
   const router = useRouter();
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const isTablet = useMediaQuery("(max-width: 1024px)");
 
   // State declarations
   const [isEditMode, setIsEditMode] = useState(false);
@@ -243,7 +241,6 @@ export function BlogWriteEditor() {
   const [isFeatured, setIsFeatured] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [allowComments, setAllowComments] = useState(true);
-  const [autoSaveStatus, setAutoSaveStatus] = useState("All changes saved");
   const [seoScore, setSeoScore] = useState(0);
   const [seoAnalysis, setSeoAnalysis] = useState<SEOAnalysis>({ score: 0, issues: [], suggestions: [] });
   const [featuredImage, setFeaturedImage] = useState<string | null>(null);
@@ -264,7 +261,6 @@ export function BlogWriteEditor() {
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [isGeneratingSubtitle, setIsGeneratingSubtitle] = useState(false);
   const [isGeneratingExcerpt, setIsGeneratingExcerpt] = useState(false);
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>(getTopicKeywords(category));
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -387,7 +383,7 @@ export function BlogWriteEditor() {
       toast.success("Subtitle generated successfully.");
 
     } catch (err) {
-      toast.error("Failed to generate subtitle.");
+      toast.error( err instanceof Error ? err.message : "Failed to generate subtitle.");
     } finally {
       setIsGeneratingSubtitle(false);
     }
@@ -416,8 +412,7 @@ export function BlogWriteEditor() {
         throw new Error(data.error || "Failed to generate excerpt.");
       }
     } catch (error) {
-
-      toast.error("Failed to generate excerpt.");
+      toast.error( error instanceof Error ? error.message :"Failed to generate excerpt.");
     } finally {
       setIsGeneratingExcerpt(false);
     }
@@ -529,7 +524,7 @@ export function BlogWriteEditor() {
   }, [
     title, content, featuredImage, user?.id, subtitle, excerpt, category, tags, 
     isFeatured, isPublic, featuredVideo, galleryImages, seoScore, allowComments, 
-    authorBio, author, authorTitle, isEditMode, existingPost, router, toast
+    authorBio, author, authorTitle, isEditMode, existingPost, router
   ]);
 
   const handlePublish = useCallback(() => handleSubmit(true), [handleSubmit]);
@@ -591,8 +586,8 @@ export function BlogWriteEditor() {
   }, []);
 
   useEffect(() => {
-    if (!author && user?.username) {
-      setAuthor(user.firstName || '');
+    if (!author && user?.userName) {
+      setAuthor(user.userName || '');
     }
   }, [user, author]);
 
@@ -621,7 +616,7 @@ export function BlogWriteEditor() {
             setFeaturedImage(result.data.featuredImage || null);
             setFeaturedVideo(result.data.featuredVideo || null);
             setGalleryImages(result.data.galleryImages || []);
-            setAuthor(result.data.author || user?.firstName || "");
+            setAuthor(result.data.author || user?.userName || "");
             setAuthorTitle(result.data.authorTitle || "");
             setAuthorBio(result.data.authorBio || "");
             setPublishDate(new Date(result.data.createdAt).toISOString().split('T')[0]);
@@ -630,7 +625,7 @@ export function BlogWriteEditor() {
           }
         } catch (error) {
 
-          toast.error("Failed to load post data");
+          toast.error(error instanceof Error ? error.message : "Failed to load post data");
         }
       }
     };
@@ -846,7 +841,7 @@ export function BlogWriteEditor() {
                     }}
                     onUploadError={(error: Error) => {
                       setIsUploading(false);
-                      toast.error("Failed to upload image. Please try again.");
+                      toast.error(error.message ||"Failed to upload image. Please try again.");
                     }}
                     onUploadBegin={() => {
                       setIsUploading(true);
@@ -927,7 +922,7 @@ export function BlogWriteEditor() {
                       }}
                       onUploadError={(error: Error) => {
                         setIsVideoUploading(false);
-                        toast.error("Failed to upload video. Please try again.");
+                        toast.error(error.message ||"Failed to upload video. Please try again.");
                       }}
                       onUploadBegin={() => {
                         setIsVideoUploading(true);
@@ -990,7 +985,7 @@ export function BlogWriteEditor() {
                       }}
                       onUploadError={(error: Error) => {
                         setIsGalleryUploading(false);
-                        toast.error("Failed to upload images. Please try again.");
+                        toast.error(error.message || "Failed to upload images. Please try again.");
                       }}
                       onUploadBegin={() => {
                         setIsGalleryUploading(true);

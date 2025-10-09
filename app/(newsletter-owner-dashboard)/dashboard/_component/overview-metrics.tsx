@@ -10,19 +10,14 @@ import {
   Line,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts"
-import { TrendingUp, Users, Mail, Eye, MousePointer, FileText, Clock, Share2, Heart, Plus, AlertCircle } from "lucide-react"
+import { TrendingUp, Users, Mail, Eye, MousePointer, FileText, Share2, Plus, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { 
   BlogPerformance, 

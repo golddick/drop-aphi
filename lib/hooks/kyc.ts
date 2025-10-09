@@ -1,17 +1,16 @@
-// src/lib/kyc.ts
 export type KycLevels = {
   level1?: { completed: boolean };
   level2?: { completed: boolean };
   level3?: { completed: boolean };
 };
 
-export function computeCompletion(levels: any, status: string): number {
+export function computeCompletion(levels: KycLevels | null | undefined, status: string): number {
   if (!levels) return 0;
 
-  const parsedLevels = levels as KycLevels;
+  const parsedLevels = levels;
 
   let completedCount = 0;
-  let total = 3;
+  const total = 3; // ✅ changed from let → const
 
   if (parsedLevels.level1?.completed) completedCount++;
   if (parsedLevels.level2?.completed) completedCount++;

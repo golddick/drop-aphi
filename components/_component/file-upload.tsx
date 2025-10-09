@@ -1,4 +1,3 @@
-// src/components/ui/file-upload.tsx
 "use client";
 
 import { useCallback, useState } from "react";
@@ -7,32 +6,39 @@ import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
 import { useDropzone } from "@uploadthing/react";
 
-
 interface FileUploadProps {
-  onChange: (file: File) => void;
+  onChange: (file: File | null) => void;
   accept?: string[];
   maxSize?: number;
   value?: File | null;
 }
 
-export function FileUpload({ onChange, accept, maxSize = 4 * 1024 * 1024, value }: FileUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+export function FileUpload({
+  onChange,
+  accept,
+  maxSize = 4 * 1024 * 1024,
+  value,
+}: FileUploadProps) {
+  const [isUploading, _setIsUploading] = useState(false);
+  const [progress, _setProgress] = useState(0);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      if (file.size > maxSize) {
-        alert(`File is too large. Max size is ${maxSize / 1024 / 1024}MB`);
-        return;
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        if (file.size > maxSize) {
+          alert(`File is too large. Max size is ${maxSize / 1024 / 1024}MB`);
+          return;
+        }
+        onChange(file);
       }
-      onChange(file);
-    }
-  }, [onChange, maxSize]);
+    },
+    [onChange, maxSize]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: accept ? Object.fromEntries(accept.map(ext => [ext, []])) : undefined,
+    accept: accept ? Object.fromEntries(accept.map((ext) => [ext, []])) : undefined,
     maxFiles: 1,
     multiple: false,
   });
@@ -56,7 +62,7 @@ export function FileUpload({ onChange, accept, maxSize = 4 * 1024 * 1024, value 
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onChange(null as any)}
+            onClick={() => onChange(null)}
             disabled={isUploading}
           >
             <X className="h-4 w-4" />
@@ -66,7 +72,9 @@ export function FileUpload({ onChange, accept, maxSize = 4 * 1024 * 1024, value 
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+            isDragActive
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-300 hover:border-gray-400"
           }`}
         >
           <input {...getInputProps()} />
@@ -77,8 +85,9 @@ export function FileUpload({ onChange, accept, maxSize = 4 * 1024 * 1024, value 
               : "Drag and drop your file here, or click to browse"}
           </p>
           <p className="text-xs text-gray-500 mt-2">
-            {accept ? `Supported formats: ${accept.join(", ")}` : "Any file type"} • Max size:{" "}
-            {maxSize / 1024 / 1024}MB
+            {accept
+              ? `Supported formats: ${accept.join(", ")}`
+              : "Any file type"} • Max size: {maxSize / 1024 / 1024}MB
           </p>
         </div>
       )}

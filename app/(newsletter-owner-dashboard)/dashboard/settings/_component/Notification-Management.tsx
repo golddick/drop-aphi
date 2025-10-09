@@ -1,16 +1,15 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
+import {  useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent} from "@/components/ui/tabs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   Mail,
-  Search,
   MoreHorizontal,
   Eye,
   Trash2,
@@ -33,16 +32,11 @@ import {
   BookOpen,
   Megaphone,
   Target,
-  Filter,
-  Settings,
-  Send,
   TrendingUp,
   Bell,
   LucideIcon,
   Pen
 } from "lucide-react"
-
-import { useRouter } from "next/navigation"
 import { useAuthUser } from "@/lib/auth/getClientAuth"
 import { useNotifications } from "@/lib/hooks/useNotifications"
 import { EmailNotification, NotificationPriority, NotificationStatus, NotificationType } from "@/lib/generated/prisma"
@@ -63,7 +57,6 @@ interface NotificationContent {
 export function NotificationCenter() {
  const { user } = useAuthUser()
   const userId = user?.userId
-  const router = useRouter()
 
   const {
     notifications,
@@ -72,7 +65,6 @@ export function NotificationCenter() {
     unreadCount,
     refreshNotifications,
     markAsRead, 
-    markAllAsRead,
     deleteNotification,
     pagination
   } = useNotifications(userId || "")
@@ -163,7 +155,7 @@ export function NotificationCenter() {
       await deleteNotification(notificationId)
         toast.success("Notification deleted successfully")
     } catch (error) {
-    toast.error("Failed to delete notification")
+     toast.error(  error instanceof Error ? error.message : "Failed to delete notification")
     }
   }
 
@@ -172,7 +164,7 @@ export function NotificationCenter() {
       await markAsRead(notificationId)
       toast.success("Notification marked as read successfully")
     } catch (error) {
-      toast.error("Failed to mark notification as read")
+      toast.error(error instanceof Error ? error.message : "Failed to mark notification as read")
     }
   }
 

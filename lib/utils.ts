@@ -175,7 +175,7 @@ export async function requireSuperAdmin(userId: string) {
     select: { role: true },
   });
 
-//   if (!membership || membership.role !== "THENEWSADMIN") {
-//     throw new Error("Unauthorized: Super Admins only");
-//   }
+  if (!membership || membership.role !== "SUPERADMIN") {
+    throw new Error("Unauthorized: Super Admins only");
+  }
 }

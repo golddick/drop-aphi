@@ -11,19 +11,17 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
-  Search, UserPlus, MoreVertical, Mail, Trash2, Eye, User, UserCheck, UserMinus, BotIcon, Grid, List
+  Search, UserPlus, MoreVertical, Mail, Trash2, Eye, User, UserCheck, UserMinus, Grid, List
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AddSubscriberDialog } from "./add-subscriber-dialog";
-import { toast } from "sonner";
 import { useSubscribers } from "@/actions/subscriber/use.subscriber";
 import { formatDate, formatString } from "@/lib/utils";
 import { ImportSubscriberModal } from "./ImportSubscriberModal";
@@ -157,14 +155,6 @@ export function SubscribersDashboard() {
                   className="pl-10 w-full"
                 />
               </div>
-              {/* <Select  value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value={SubscriptionStatus.Subscribed}>Subscribed</SelectItem>
-                  <SelectItem value={SubscriptionStatus.Unsubscribed}>Unsubscribed</SelectItem>
-                </SelectContent>
-              </Select> */}
             </div>
             <ImportSubscriberModal newsletterOwnerId={user?.id} onImportComplete={refetchSubscribers} />
           </CardContent>

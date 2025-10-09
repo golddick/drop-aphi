@@ -80,7 +80,7 @@ export function BlogManagement() {
   const { user } = useAuthUser()
   const [searchQuery, setSearchQuery] = useState("")
   const [searchInput, setSearchInput] = useState("") 
-  const [statusFilter, setStatusFilter] = useState("all")
+  const [statusFilter] = useState("all")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [sortBy, setSortBy] = useState("updated")
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null)
@@ -92,7 +92,7 @@ export function BlogManagement() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!user?.id) return
+      if (!user?.userId) return
       const [postData, categoryData] = await Promise.all([
         getFilteredPosts({ 
           authorId: user.userId, 
@@ -107,7 +107,7 @@ export function BlogManagement() {
     }
 
     fetchData()
-  }, [user?.id, searchQuery, categoryFilter, sortBy])
+  }, [user?.userId, searchQuery, categoryFilter, sortBy])
 
   if (posts.length === 0 && categories.length === 0) {
     return <Loader />

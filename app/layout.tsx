@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css"
-import { Inter, Playfair_Display } from "next/font/google"
+import {  Playfair_Display } from "next/font/google"
 import localFont from "next/font/local";
 import Providers from "@/lib/utils/Providers";
 
@@ -19,11 +19,11 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    template: "dropaphi",
+    template: "Drop-Aphi",
     default: "Where Creators Write and Developers Integrate.",
   },
   icons: {
-    icon: "/2logo.jpg",
+    icon: "/drop-logo.jpg",
   },
   description: "To empower developers to embed communication and creators to publish content—seamlessly through a single powerful API.",
 };

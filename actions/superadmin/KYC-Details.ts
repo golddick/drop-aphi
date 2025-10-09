@@ -74,7 +74,8 @@ export async function fetchKycById(kycId: string) {
     }
 
      // 🧮 Compute completion percentage
-    const completion = computeCompletion(kyc.levels, kyc.status);
+    const levels = typeof kyc.levels === "string" ? JSON.parse(kyc.levels) : kyc.levels;
+    const completion = computeCompletion(levels, kyc.status);
 
 
     return { success: true, data: { ...kyc, completion } };

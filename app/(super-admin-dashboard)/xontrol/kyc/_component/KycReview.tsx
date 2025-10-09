@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,6 @@ import {
   FileText,
   User,
   Mail,
-  Phone,
   MapPin,
   CreditCard,
   Camera,
@@ -679,11 +677,14 @@ export function KycReview({ kycId }: KycReviewProps) {
                         </DialogHeader>
                         <div className="flex justify-center p-4">
                           {kycData.livePhoto ? (
-                            <img
-                              src={kycData.livePhoto}
-                              alt="Live Photo"
-                              className="max-w-full max-h-96 object-contain border rounded"
-                            />
+                            <div className="mx-auto w-48 h-48 bg-gray-100 rounded-lg overflow-hidden relative">
+                              <Image
+                                src={kycData.livePhoto}
+                                alt=" live photo"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
                           ) : (
                             <div className="flex items-center justify-center w-full h-64 bg-gray-100 border rounded">
                               <div className="text-center">

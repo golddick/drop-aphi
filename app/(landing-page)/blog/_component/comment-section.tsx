@@ -370,8 +370,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   onReportComment,
 }) => {
   const [newCommentText, setNewCommentText] = useState("")
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "popular">("newest")
-  const [isLoading, setIsLoading] = useState(false)
+  const [sortBy] = useState<"newest" | "oldest" | "popular">("newest")
+  const [isLoading] = useState(false)
 
   const handleNewCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault()

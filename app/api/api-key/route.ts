@@ -86,7 +86,7 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json(apiKeyRecord, { status: 200 });
-  } catch (err: any) {
+  } catch (err) {
     console.error("API Key Error:", err);
     return NextResponse.json({ error: "Failed to generate key" }, { status: 500 });
   }

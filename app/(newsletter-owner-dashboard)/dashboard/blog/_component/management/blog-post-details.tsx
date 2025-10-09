@@ -16,8 +16,6 @@ import {
   Star,
   BarChart3,
   Share2,
-  Copy,
-  Download,
   FileText,
   Tag,
   Settings,
@@ -91,7 +89,7 @@ interface BlogPostDetailsProps {
   onDelete: () => void
 }
 
-export function BlogPostDetails({ post, onClose, onEdit, onDelete }: BlogPostDetailsProps) {
+export function BlogPostDetails({ post, onEdit, onDelete }: BlogPostDetailsProps) {
   const [activeTab, setActiveTab] = useState("overview")
 
 
@@ -411,8 +409,8 @@ export function BlogPostDetails({ post, onClose, onEdit, onDelete }: BlogPostDet
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-green-600 mb-2">
-                  {/* {Math.round((post.seoScore + (post.views > 1000 ? 20 : 0) + (post.likes > 50 ? 15 : 0)) / 1.35)} */}
-                  {calculatePerformanceScore(post)}
+                  {/* {calculatePerformanceScore(post)} */}
+                  {score}
                 </div>
                 <p className="text-gray-600">Overall content performance</p>
               </CardContent>

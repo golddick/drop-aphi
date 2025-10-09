@@ -6,7 +6,7 @@ type UseShareParams = {
   url: string;
   title: string;
   description?: string;
-  image?: string;        // Featured image URL
+  image?: string; // Featured image URL
   hashtags?: string[];
   via?: string;
 };
@@ -58,15 +58,33 @@ export function useShare({
     [links, url]
   );
 
+  // ✅ Properly typed Web Share API handler
   const webShare = useCallback(async () => {
-    if (typeof navigator !== "undefined" && (navigator as any).share) {
+    const nav = navigator as Navigator & {
+      share?: (data: ShareData) => Promise<void>;
+      canShare?: (data: ShareData) => boolean;
+    };
+
+    if (nav.share) {
       try {
-        await (navigator as any).share({
+        const shareData: ShareData = {
           title,
           text: description ?? title,
           url,
-          ...(image ? { files: [new File([], image)] } : {}),
-        });
+        };
+
+        if (image) {
+          try {
+            const file = new File([], image);
+            if (nav.canShare?.({ files: [file] })) {
+              shareData.files = [file];
+            }
+          } catch {
+            // Skip file if not supported
+          }
+        }
+
+        await nav.share(shareData);
       } catch {
         // user cancelled
       }
@@ -77,5 +95,3 @@ export function useShare({
 
   return { links, open, webShare };
 }
-
-

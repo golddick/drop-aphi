@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Users, Mail, Shield, FileText, DollarSign, Activity } from "lucide-react";
+import { Users, Mail, Shield, FileText } from "lucide-react";
 import { getOverviewStats } from "@/actions/superadmin/overview";
 import { FaNairaSign } from "react-icons/fa6";
 
