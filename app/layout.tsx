@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 })
 
-
+ 
 
 export const metadata: Metadata = {
   title: {
