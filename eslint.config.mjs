@@ -1,4 +1,3 @@
-// eslint.config.js
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -9,12 +8,12 @@ const compat = new FlatCompat({ baseDirectory: __dirname });
 
 /** @type {import("eslint").Linter.FlatConfig[]} */
 const eslintConfig = [
-  // 1️⃣ Global ignore block — this MUST come before the rest
   {
+    // ✅ Tell ESLint to ignore Prisma generated files (not delete or skip them)
     ignores: [
+      "**/lib/generated/prisma/**",
       "**/generated/**",
       "**/prisma/**",
-      "**/lib/generated/prisma/**",
       "node_modules/**",
       ".next/**",
       "out/**",
@@ -23,10 +22,10 @@ const eslintConfig = [
     ],
   },
 
-  // 2️⃣ Extend Next.js + TypeScript base rules
+  // ✅ Use recommended base configs
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 
-  // 3️⃣ Custom rules for your source code
+  // ✅ Your custom rules
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
