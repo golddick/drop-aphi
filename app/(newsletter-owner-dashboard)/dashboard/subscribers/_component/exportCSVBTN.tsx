@@ -121,7 +121,7 @@ const ImportCSVBTN = ({
   return (
     <div className="relative">
       <Button variant="default" className="w-full" disabled={isLoading}>
-        {isLoading ? "Processing..." : "Import Subscribers"}
+        {isLoading ? "Processing..." : "Import "}
       </Button>
       <input
         type="file"
