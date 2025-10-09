@@ -4,11 +4,18 @@
     {
       "src": "package.json",
       "use": "@vercel/next"
-    } 
-  ],
-  "build": {
-    "env": {
-      "PRISMA_GENERATE": "true"
     }
+  ],
+  "functions": {
+    "app/**/*.js": {
+      "includeFiles": [
+        "lib/generated/prisma/**",
+        "node_modules/.prisma/client/**",
+        "node_modules/@prisma/engines/**"
+      ]
+    }
+  },
+  "env": {
+    "PRISMA_GENERATE": "true"
   }
 }
