@@ -216,7 +216,7 @@ export function AddSubscriberDialog({
           {/* Page URL */}
           <Card>
             <CardContent className="p-4">
-              <Label htmlFor="pageUrl">Page URL (Optional.)</Label>
+              <Label htmlFor="pageUrl">Page URL (Optional...)</Label>
               <Input
                 id="pageUrl"
                 value={formData.pageUrl}
