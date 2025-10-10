@@ -1,10 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "prisma generate && next build",
-  "installCommand": "npm install",
-  "functions": {
-    "app/**/*.js": {
-      "includeFiles": "lib/generated/prisma/**"
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "build": {
+    "env": {
+      "PRISMA_GENERATE": "true"
     }
   }
 }
