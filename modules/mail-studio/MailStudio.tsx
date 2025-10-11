@@ -960,7 +960,7 @@ export default function MailStudio() {
 
   return (
     <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className={`h-screen flex flex-col bg-background ${isMobile ? "mobile-stack text-xs" : ""}`}>
+      <div className={`h-screen px-4 flex flex-col bg-background ${isMobile ? "mobile-stack text-xs" : ""}`}>
         {/* Header */}
         <header
           className={`${isMobile ? "h-12 px-3 text-xs" : "h-16 px-6"} border-b border-border bg-card flex items-center justify-between`}
