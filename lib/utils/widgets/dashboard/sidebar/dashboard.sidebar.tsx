@@ -10,7 +10,7 @@ interface DashboardSideBarProps {
 const DashboardSideBar = ({onNavigate}:DashboardSideBarProps) => {
 
   return (
-    <div className="p-2  bg-black text-white h-full  fixed top-0 left-0 w-[250px] hidden lg:block overflow-y-scroll hidden-scrollbar">
+    <div className="p-2  bg-gray-100  text-black  h-full  fixed top-0 left-0 w-[250px] hidden lg:block overflow-y-scroll hidden-scrollbar">
       <div>
         <DashboardItems  onNavigate={onNavigate}/>
         <UserPlan />
