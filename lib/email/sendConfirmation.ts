@@ -50,7 +50,7 @@ export const sendConfirmationEmail = async ({
       fromApplication,
     })
  
-    if (!result.success) {
+    if (!result.success) { 
       throw new Error(result.error || 'Failed to send confirmation email')
     }
 

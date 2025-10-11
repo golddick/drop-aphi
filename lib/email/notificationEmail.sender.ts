@@ -36,7 +36,7 @@ export const sendNotificationEmail = async (params: SendNotificationEmailParams)
     enableUnsubscribe = true,
   } = params;
 
-  const domain = process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://thenews.africa';
+  const domain = process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://drop-aphi.vercel.app';
   const startTime = Date.now();
   const trackingId = `ntf_${Date.now()}`;
 
@@ -103,7 +103,7 @@ export const sendNotificationEmail = async (params: SendNotificationEmailParams)
               enhancedContent += `
                 <div style="text-align:center;margin-top:20px;font-size:12px;color:#666;">
                   <p style="margin: 0 0 10px;">
-                    © 2025 <a href="https://thenews.africa" style="color: #666666; text-decoration: underline;" target="_blank">Drop-aphi</a>. All rights reserved.
+                    © 2025 <a href="https://drop-aphi.vercel.app" style="color: #666666; text-decoration: underline;" target="_blank">Drop-aphi</a>. All rights reserved.
                   </p>
                   ${enableUnsubscribe ? `
                   <p style="margin: 0;">
@@ -125,7 +125,7 @@ export const sendNotificationEmail = async (params: SendNotificationEmailParams)
                 to: email,
                 subject: subject,
                 html: enhancedContent,
-                headers: {
+                headers: { 
                   'X-Notification-ID': emailId,
                   'X-Tracking-ID': trackingId,
                   'X-NewsLetter-Owner-ID': newsLetterOwnerId,

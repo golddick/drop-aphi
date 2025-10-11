@@ -59,6 +59,7 @@ export const createTrialApiKey = async () => {
   const payload = {
     id: user.id,
     userId:user.userId,
+    userName: user.userName || "user",
     email: user.email || "unknown",
     senderName: user.SenderName || "drop-aphi",
     type: "trial-api-key",
@@ -71,7 +72,7 @@ export const createTrialApiKey = async () => {
   await database.apiKey.create({
     data: {
       userId: user.userId,
-      keyHash: encryptedKey,
+      keyHash: encryptedKey, 
       jwt: jwtToken,
       expiresAt,
       isTrial: true, // Mark as trial key
@@ -168,4 +169,63 @@ export const regenerateApiKey = async () => {
   });
 
   return { apiKey, expiresAt, isTrial: false };
+};
+
+
+
+
+// --------------------
+// Verify API key
+// --------------------
+
+export const verifyApiKey = async (providedKey: string) => {
+  try {
+    if (!providedKey) {
+      return { valid: false, message: "API key is required" };
+    }
+
+    // ✅ Find all API key records (user might have multiple regenerations)
+    const allKeys = await database.apiKey.findMany();
+
+    // ✅ Try matching provided key with decrypted stored ones
+    let matchedRecord = null;
+    for (const record of allKeys) {
+      try {
+        const rawKey = decryptKey(record.keyHash);
+        if (rawKey === providedKey) {
+          matchedRecord = record;
+          break;
+        }
+      } catch {
+        continue; // skip if decryption fails
+      }
+    }
+
+    if (!matchedRecord) {
+      return { valid: false, message: "Invalid API key" };
+    }
+
+    // ✅ Check expiry
+    if (matchedRecord.expiresAt < new Date()) {
+      await database.apiKey.delete({ where: { id: matchedRecord.id } });
+      return { valid: false, message: "API key has expired" };
+    }
+
+    // ✅ Verify JWT signature
+    try {
+      const decoded = jwt.verify(matchedRecord.jwt, JWT_SECRET);
+      return {
+        valid: true,
+        message: "API key verified successfully",
+        user: decoded,
+        isTrial: matchedRecord.isTrial,
+        expiresAt: matchedRecord.expiresAt,
+      };
+    } catch (jwtError) {
+      return { valid: false, message: "Invalid or expired token signature" };
+    }
+  } catch (error) {
+    console.error("API key verification error:", error);
+    return { valid: false, message: "Internal verification error" };
+  }
 };

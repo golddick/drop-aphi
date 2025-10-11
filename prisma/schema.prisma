@@ -226,6 +226,7 @@ model User {
   tokens                       RefreshToken[]
   reportedComments             ReportedComment[]
   template                     EmailTemplate[]
+  unsubscribes                 UnsubscribeEvent[]
 
   @@index([paystackCustomerId])
   @@index([paystackSubscriptionId])
@@ -275,7 +276,9 @@ model Invoice {
 model ThirdPartyOTP {
   email     String   @id
   code      String
+  appName   String
   otpType   String
+  verified  Boolean  @default(false)
   expiresAt DateTime
   createdBy String
   createdAt DateTime @default(now())
@@ -511,6 +514,7 @@ model Campaign {
   clickRate   Float?         @map("click_rate")
   lastSentAt  DateTime?      @map("last_sent_at")
   emails      Email[]
+  unsubscribes UnsubscribeEvent[]
 
   @@index([status])
 }
@@ -526,8 +530,35 @@ model Subscriber {
   pageUrl           String?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+  unsubscribedAt    DateTime?
+  unsubscribeReason String?
+  unsubscribeSource String?
 
   @@unique([email, newsLetterOwnerId], name: "unique_subscriber_key")
+
+  @@index([unsubscribedAt])
+  @@index([unsubscribeSource])
+}
+
+model UnsubscribeEvent {
+  id                String   @id @default(uuid())
+  email             String
+  newsLetterOwnerId String
+  campaignId        String?
+  reason            String?
+  source            String   @default("email_link") // email_link, api, manual, complaint
+  userAgent         String?
+  ipAddress         String?
+  createdAt         DateTime @default(now())
+
+  // Relations
+  newsLetterOwner   User     @relation(fields: [newsLetterOwnerId], references: [userId], onDelete: Cascade)
+  campaign          Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([newsLetterOwnerId])
+  @@index([createdAt])
+  @@index([source])
 }
 
 

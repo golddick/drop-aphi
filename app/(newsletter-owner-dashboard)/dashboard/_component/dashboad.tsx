@@ -332,22 +332,6 @@ export function AnalyticsDashboard() {
             <TabsContent value="overview" className="space-y-6">
               <OverviewMetrics timeRange={timeRange} />
             </TabsContent>
-
-            {/* <TabsContent value="campaigns" className="space-y-6">
-              <CampaignAnalytics timeRange={timeRange} />
-            </TabsContent>
-
-            <TabsContent value="blogs" className="space-y-6">
-              <BlogAnalytics timeRange={timeRange} />
-            </TabsContent>
-
-            <TabsContent value="subscribers" className="space-y-6">
-              <SubscriberAnalytics timeRange={timeRange} />
-            </TabsContent>
-
-            <TabsContent value="emails" className="space-y-6">
-              <EmailPerformance timeRange={timeRange} />
-            </TabsContent> */}
           </Tabs>
         </div>
       </div>

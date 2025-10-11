@@ -1,6 +1,7 @@
 "use server"
 
 import { database } from "@/lib/database"
+import { SendOTP } from "@/lib/email/sendOTP"
 import crypto from "crypto"
 
 const OTP_EXPIRY_MINUTES = 10 // OTP valid for 10 minutes
@@ -17,7 +18,7 @@ interface VerifyOTPResult {
   success: boolean
   message: string
   user?: any
-  error?: string
+  error?: string 
 }
 
 // Generate OTP
@@ -43,7 +44,7 @@ export async function generateOTP(email: string): Promise<OTPResult> {
         error: "USER_NOT_FOUND"
       }
     }
-
+ 
     // Generate 6-digit OTP
     const otp = crypto.randomInt(100000, 999999).toString()
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000)
@@ -66,12 +67,8 @@ export async function generateOTP(email: string): Promise<OTPResult> {
       }
     })
 
-    // In production, you would send the OTP via email/SMS
-    // For demo purposes, we'll log it to console
     console.log(`OTP for ${email}: ${otp}`)
-
-    // TODO: Implement actual email sending
-    // await sendOTPEmail(email, otp)
+     await SendOTP({ userEmail: email, otp });
 
     return {
       success: true,
