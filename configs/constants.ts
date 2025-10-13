@@ -27,7 +27,7 @@ export const navItems: NavItems[] = [
   },
   {
     title: "Docs",
-    link: "/documentation",
+    link: "/api-doc",
   },
 ];
 
@@ -98,11 +98,11 @@ export const sideBarItems: DashboardSideBarTypes[] = [
     icon: ICONS.dashboard,
   },
 
-    {
-    title: "Campaign",
-    url: "/dashboard/campaigns",
-    icon: ICONS.analytics,
-  },
+  //   {
+  //   title: "Campaign",
+  //   url: "/dashboard/campaigns",
+  //   icon: ICONS.analytics,
+  // },
   
    {
     title: "Mail",
@@ -128,11 +128,11 @@ export const sideBarBottomItems: DashboardSideBarTypes[] = [
     url: "/dashboard/settings",
     icon: ICONS.settings,
   },
-  {
-    title: "Generated URL",
-    url: "/dashboard/url",
-    icon: ICONS.world,
-  },
+  // {
+  //   title: "Generated URL",
+  //   url: "/dashboard/url",
+  //   icon: ICONS.world,
+  // },
 
 ];
 

@@ -44,7 +44,7 @@ function MobileBanner() {
     <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-yellow-900 p-3 z-50 shadow-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Icons.AlertTriangle className="w-4 h-4" />
+          <Icons.X className="w-4 h-4" />
           <span className="text-sm font-medium">
             For the best UI experience, please open this page on a desktop computer.
           </span>
@@ -417,7 +417,7 @@ export default function MailStudio() {
         
         {/* Header */}
         <header
-          className={`${isMobile ? "h-12 px-3 text-xs mt-12" : "h-16 px-6"} border-b border-border bg-card flex items-center justify-between`}
+          className={`${isMobile ? "h-12 px-3 hidden text-xs mt-12" : "h-16 block px-6"} border-b border-border bg-card flex items-center justify-between`}
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
@@ -521,12 +521,12 @@ export default function MailStudio() {
         </header>
 
         {/* Main Content */}
-        <div className={`flex-1 flex ${isMobile ? "mobile-stack" : ""}`}>
+        <div className={`flex-1 flex ${isMobile ? " grid grid-cols-[2fr_0.5fr] gap-1" : ""}`}>
           {mode === "visual" ? (
             <>
               {/* Left Sidebar - Component Library */}
               <aside
-                className={`${isMobile ? "w-full h-24 overflow-x-auto p-2" : "w-64 p-4"} bg-sidebar border-r border-sidebar-border flex flex-col`}
+                className={`${isMobile ? "w-full hidden h-24 overflow-x-auto p-2" : "w-64 block p-4"} bg-sidebar border-r border-sidebar-border flex flex-col`}
               >
                 <div className={`${isMobile ? "mb-2" : "mb-3 border-b border-sidebar-border pb-3"}`}>
                   <h2 className={`font-semibold text-sidebar-foreground ${isMobile ? "text-xs mb-1" : "text-sm mb-3"}`}>Components</h2>
@@ -558,7 +558,7 @@ export default function MailStudio() {
               </aside>
 
               {/* Center Canvas */}
-              <main className={`flex-1 bg-canvas canvas-grid overflow-auto ${isMobile ? "p-2" : "p-8"}`}>
+              <main className={`flex-1 bg-canvas canvas-grid overflow-auto ${isMobile ? "p-2 " : "p-8 "}`}>
                 <div className={`${isMobile ? "w-full" : "max-w-2xl mx-auto"}`}>
                   <SortableContext
                     items={emailState.elements.map((el) => el.id)}
@@ -572,7 +572,7 @@ export default function MailStudio() {
               </main>
 
               {/* Right Sidebar - Properties Panel */}
-              <aside className={`${isMobile ? "w-full p-3" : "w-80 p-4"} bg-properties border-l border-border flex flex-col`}>
+              <aside className={`${isMobile ? "w-full p-3  "  : "w-80 p-4 "} bg-properties border-l border-border flex flex-col`}>
                 <div className={`${isMobile ? "mb-2" : "mb-3 border-b border-border pb-3"}`}>
                   <h2 className={`font-semibold ${isMobile ? "text-xs mb-0.5" : "text-sm mb-1"}`}>Properties</h2>
                   <p className={`text-muted-foreground ${isMobile ? "text-[10px]" : "text-xs"}`}>

@@ -18,6 +18,8 @@ import { Menu } from "lucide-react";
 import { useState } from "react"
 import DashboardItems from "./sidebar/dashboard.items";
 import UserPlan from "./sidebar/user.plan";
+import Link from "next/link";
+import Logo from "../header/logo";
 
 export function MobileNav() {
 
@@ -34,7 +36,10 @@ export function MobileNav() {
       </SheetTrigger>
       <SheetContent side={'left'} className="  bg-gray-100 w-[250px] min-h-screen overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Drop-Aphi</SheetTitle>
+          {/* <SheetTitle>Drop-Aphi</SheetTitle> */}
+          <Link href={"/"}> 
+            <Logo />
+          </Link>
           <SheetDescription>
           Communicate with Aphi
           </SheetDescription>

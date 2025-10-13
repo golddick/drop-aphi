@@ -21,7 +21,8 @@ import {
 } from "lucide-react"
 import { OverviewMetrics } from "./overview-metrics"
 import Link from "next/link"
-import { getOverallStats, OverallStats } from "@/actions/analytics/analytics-actions"
+import { getOverallStats } from "@/actions/analytics/analytics-actions"
+import { OverallStats } from "@/lib/schemas/analytics-stats"
 
 
 export function AnalyticsDashboard() {
@@ -75,7 +76,7 @@ export function AnalyticsDashboard() {
         <div className="w-full px-4 py-8">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-500" />
+              <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-red-500" />
               <p className="text-gray-600">Loading analytics...</p>
             </div>
           </div>
@@ -160,9 +161,9 @@ export function AnalyticsDashboard() {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-4 lg:mt-0">
+            <div className="flex flex-row justify-between gap-4 mt-4 lg:mt-0">
               <Select value={timeRange} onValueChange={setTimeRange} disabled={refreshing}>
-                <SelectTrigger className="w-48 border-gray-300">
+                <SelectTrigger className=" w-fit border-gray-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,23 +178,27 @@ export function AnalyticsDashboard() {
               <Link href={"/dashboard/blog/write"}>
                 <Button variant="outline" className="border-gray-300 bg-transparent hover:bg-black hover:text-white">
                   <Pen className="h-4 w-4 mr-2" />
-                  Write Blog Post
+                    <span className="">
+                          Write  Blog 
+                    </span>
                 </Button>
               </Link>
-              <Link href={"/dashboard/mail/write"}>
-                <Button variant="outline" className="border-gray-300 bg-transparent hover:bg-black hover:text-white">
+              <Link href={"/dashboard/mail/write"}  className=" hidden lg:block">
+                <Button variant="outline" className="border-gray-300 bg-transparent hover:bg-black hover:text-white ">
                   <Pen className="h-4 w-4 mr-2" />
                   Write Mail
                 </Button>
               </Link>
               <Button 
                 variant="outline" 
-                className="border-gray-300 bg-transparent hover:bg-black hover:text-white"
+                className="border-gray-300 bg-transparent hover:bg-black hover:text-white w-fit"
                 onClick={handleRefresh}
                 disabled={refreshing}
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                {refreshing ? 'Refreshing...' : 'Refresh'}
+                <span className=" hidden md:block">
+                  {refreshing ? 'Refreshing...' : 'Refresh'}
+                </span>
               </Button>
             </div>
           </div>
@@ -338,3 +343,4 @@ export function AnalyticsDashboard() {
     </div>
   )
 }
+

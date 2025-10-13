@@ -26,12 +26,15 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  User,
+  MousePointerClick,
 } from "lucide-react"
 import Link from "next/link"
 import { EmailStats, getEmails, getEmailStats } from "@/actions/email/email-actions"
 import { deleteEmail } from "@/actions/email/emails"
 import { useMediaQuery } from "@/lib/hooks/use-media-query"
 import { toast } from "sonner"
+import { MdOpenInBrowser } from "react-icons/md"
 
 // Types for our email data
 interface Email {
@@ -62,7 +65,7 @@ interface PaginationState {
   itemsPerPage: number
   totalItems: number
   totalPages: number
-}
+} 
 
 export function EmailsDashboard() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -364,7 +367,7 @@ export function EmailsDashboard() {
           <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
             <div className="relative w-full">
               <Input
-                placeholder="Search emails by subject, integration, or campaign..."
+                placeholder="Search emails by subject or campaign..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 border-gray-300 focus:border-black focus:ring-black text-sm sm:text-base"
@@ -372,7 +375,7 @@ export function EmailsDashboard() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             </div>
 
-            <div className="flex gap-2 w-full md:w-auto">
+            {/* <div className="flex gap-2 w-full md:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-32 border-gray-300 focus:border-black focus:ring-black text-sm">
                   <SelectValue placeholder="Status" />
@@ -397,7 +400,7 @@ export function EmailsDashboard() {
                   <SelectItem value="instant">Instant</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
           </div>
         </motion.div>
 
@@ -419,29 +422,14 @@ export function EmailsDashboard() {
           <CardContent className="p-0">
             <div className="divide-y divide-gray-200">
               {currentPageEmails.map((email) => (
-                <div key={email.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 gap-2 mb-3">
+                <div key={email.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors ">
+                  <div className=" grid grid-cols-[2fr_1fr] md:flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1 md:gap-4">
+                    <div className="flex-1 ">
+                      <div className="flex flex-row sm:items-center  gap-2 ">
                         <h3 className="text-base sm:text-lg font-semibold text-black break-words capitalize">{email.subject}</h3>
                         <div className="flex flex-wrap gap-2">
                           <Badge className={`text-xs ${getStatusBadge(email.status)}`}>
                             {getStatusDisplay(email.status)}
-                          </Badge>
-                          <Badge className={`text-xs ${getTypeBadge(email.type)}`}>
-                            {email.type === "automated" ? (
-                              <>
-                                <Bot className="w-3 h-3 mr-1" />
-                                <span className="hidden sm:inline">Automated</span>
-                                <span className="sm:hidden">Auto</span>
-                              </>
-                            ) : (
-                              <>
-                                <Zap className="w-3 h-3 mr-1" />
-                                <span className="hidden sm:inline">Instant</span>
-                                <span className="sm:hidden">Inst</span>
-                              </>
-                            )}
                           </Badge>
                         </div>
                       </div>
@@ -452,27 +440,30 @@ export function EmailsDashboard() {
                             )
                         }
                  
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 gap-2 text-xs sm:text-sm text-gray-500">
+                      <div className="flex flex-row sm:items-center md:space-x-6 gap-2 text-xs sm:text-sm text-gray-500">
                         <div>Campaign: {email.campaign}</div>
                         {email.sentDate && <div>Sent: {email.sentDate}</div>}
                         {email.scheduleDate && <div>Scheduled: {new Date(email.scheduleDate).toLocaleDateString()}</div>}
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center  gap-4">
                       {email.status !== "draft" && (
                         <div className="text-right">
                           <div className="grid grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
-                            <div>
-                              <p className="text-gray-500">Recipients</p>
+                            <div className=" w-full justify-center flex items-center flex-col">
+                              <p className="text-gray-500 hidden md:block">Recipients</p>
+                              <User className=" flex size-5 md:hidden"/>
                               <p className="font-semibold text-black">{email.recipients.toLocaleString()}</p>
                             </div>
-                            <div>
-                              <p className="text-gray-500">Open Rate</p>
+                            <div className=" w-full justify-center flex items-center flex-col">
+                              <p className="text-gray-500  hidden md:block">Open Rate</p>
+                              <Eye className=" flex size-5 md:hidden"/>
                               <p className="font-semibold text-black">{email.openRate.toFixed(1)}%</p>
                             </div>
-                            <div>
-                              <p className="text-gray-500">Click Rate</p>
+                            <div className=" w-full justify-center flex items-center flex-col">
+                              <p className="text-gray-500  hidden md:block">Click Rate</p>
+                              <MousePointerClick className=" flex size-5 md:hidden"/>
                               <p className="font-semibold text-black">{email.clickRate.toFixed(1)}%</p>
                             </div>
                           </div>

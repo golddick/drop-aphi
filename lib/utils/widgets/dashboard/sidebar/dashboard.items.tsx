@@ -1,9 +1,10 @@
 
+import { logoutUser } from "@/actions/auth/login";
 import { sideBarBottomItems, sideBarItems } from "@/configs/constants";
 import useRouteChange from "@/lib/utils/hooks/useRouteChange";
 import { ICONS } from "@/lib/utils/icons";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import {  usePathname } from "next/navigation";
 import { useEffect } from "react";
  
 interface DashboardSideBarProps {
@@ -15,11 +16,33 @@ const DashboardItems = ({ onNavigate, bottomContent }: DashboardSideBarProps) =>
   const {  setActiveRoute } = useRouteChange();
   const pathName = usePathname();
 
-  const LogoutHandler = () => {
-    // signOut();
-    redirect("/");
-  };
-
+    const LogoutHandler = async () => {
+      try {
+        console.log("🔐 Initiating logout...");
+        
+        // Call the server action
+        const result = await logoutUser();
+        
+        if (result.success) {
+          console.log("✅ " + result.message);
+          
+          // Clear any client-side storage
+          localStorage.removeItem("dropaphi-autosave");
+          sessionStorage.clear();
+          
+          // Force a full page reload to ensure all state is cleared
+          window.location.href = '/';
+        } else {
+          console.error("❌ Logout failed:", result.message);
+          // Still redirect even if there was an error
+          window.location.href = '/';
+        }
+      } catch (error) {
+        console.error('❌ Logout handler error:', error);
+        // Fallback redirect
+        window.location.href = '/';
+      }
+    };
   useEffect(() => {
     setActiveRoute(pathName);
   }, [pathName, setActiveRoute]);

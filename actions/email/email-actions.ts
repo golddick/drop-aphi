@@ -4,6 +4,8 @@ import { getServerAuth } from '@/lib/auth/getauth'
 import { database } from '@/lib/database'
 import { EmailStatus, EmailType } from '@/lib/generated/prisma'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { toast } from 'sonner'
 
 // Types based on your schema
 export interface CreateEmailData {
@@ -54,10 +56,11 @@ export interface EmailStats {
 }
 
 // Helper function to get authenticated user
+
 async function getAuthenticatedUser() {
   const user = await getServerAuth()
   if (!user?.userId) {
-    throw new Error('Authentication required')
+    redirect('/auth')
   }
   return user.userId
 }

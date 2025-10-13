@@ -1,6 +1,6 @@
 // hooks/useSubscribers.ts
 import { useState, useEffect } from 'react';
-import { getSubscribers } from '@/actions/subscriber/get.subscribers';
+import { getAllSubscribers } from '@/actions/subscriber/get.subscribers';
 import { SubscriptionStatus } from '@/lib/generated/prisma';
 
 interface Subscriber {
@@ -15,14 +15,14 @@ interface Subscriber {
 }
 
 export const useSubscribers = () => {
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSubscribers = async () => {
     try {
       setLoading(true);
-      const result = await getSubscribers();
+      const result = await getAllSubscribers();
       if (result.error) throw new Error(result.error);
 
       console.log(result.subscribers, 'reseult severr')

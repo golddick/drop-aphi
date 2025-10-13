@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useState, useEffect } from "react";
 import { getSubscribers } from "@/actions/subscriber/get.subscribers";
@@ -10,7 +10,7 @@ export default function useSubscribersData() {
   const [loading, setLoading] = useState(true);
 
   const { user } = useAuthUser();
-  const newsLetterOwnerId = user?.id;
+  const newsLetterOwnerId = user?.id; 
 
   useEffect(() => {
     if (!newsLetterOwnerId) return;

@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
       select: {
         userId: true,
         SenderName: true,
+        userName:true
       },
     });
 
@@ -56,7 +57,152 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Process unsubscribe in transaction
+    // Check if user is already unsubscribed
+    const existingUnsubscribe = await database.unsubscribeEvent.findFirst({
+      where: {
+        email: decodedEmail,
+        newsLetterOwnerId: ownerId,
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // Check current subscriber status
+    const currentSubscriber = await database.subscriber.findFirst({
+      where: {
+        email: decodedEmail,
+        newsLetterOwnerId: ownerId,
+      },
+      select: {
+        status: true,
+        unsubscribedAt: true,
+      }
+    });
+
+    const isAlreadyUnsubscribed = currentSubscriber?.status === 'UNSUBSCRIBED' || existingUnsubscribe;
+
+    if (isAlreadyUnsubscribed) {
+      console.log(`[UNSUBSCRIBE_ALREADY_DONE] Email: ${decodedEmail}, Owner: ${ownerId}`);
+      
+      // Return already unsubscribed HTML page
+      const alreadyUnsubscribedHtml = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Already Unsubscribed</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .container {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 40px;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                    text-align: center;
+                    max-width: 500px;
+                    width: 90%;
+                }
+                .info-icon {
+                    font-size: 64px;
+                    color: #F59E0B;
+                    margin-bottom: 20px;
+                }
+                h1 {
+                    color: #1F2937;
+                    margin-bottom: 16px;
+                    font-size: 28px;
+                }
+                p {
+                    color: #6B7280;
+                    line-height: 1.6;
+                    margin-bottom: 24px;
+                    font-size: 16px;
+                }
+                .info-box {
+                    background: #FFFBEB;
+                    border: 1px solid #FCD34D;
+                    border-radius: 8px;
+                    padding: 16px;
+                    margin: 20px 0;
+                    text-align: left;
+                }
+                .info-box p {
+                    margin: 8px 0;
+                    color: #92400E;
+                    font-size: 14px;
+                }
+                .button {
+                    background: #3B82F6;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 6px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    text-decoration: none;
+                    display: inline-block;
+                    transition: background 0.2s;
+                }
+                .button:hover {
+                    background: #2563EB;
+                }
+                .footer {
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 1px solid #E5E7EB;
+                    color: #9CA3AF;
+                    font-size: 14px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="info-icon">ℹ️</div>
+                <h1>Already Unsubscribed</h1>
+                <p>You're already unsubscribed from <strong>${newsletterOwner.SenderName || newsletterOwner.userName}</strong>.</p>
+                
+                <div class="info-box">
+                    <p><strong>Email:</strong> ${decodedEmail}</p>
+                    <p><strong>Newsletter:</strong> ${newsletterOwner.SenderName || newsletterOwner.userName}</p>
+                    <p><strong>Status:</strong> Already unsubscribed</p>
+                    ${existingUnsubscribe ? `<p><strong>Originally unsubscribed:</strong> ${new Date(existingUnsubscribe.createdAt).toLocaleDateString()}</p>` : ''}
+                </div>
+
+                <p style="font-size: 14px; color: #6B7280;">
+                    You were already removed from our mailing list. No further action is needed.
+                </p>
+
+                <a href="/" class="button">Return to Website</a>
+                
+                <div class="footer">
+                    <p>© ${new Date().getFullYear()} Drop-Aphi. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+      `;
+
+      return new NextResponse(alreadyUnsubscribedHtml, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
+    }
+
+    // Process unsubscribe in transaction (only if not already unsubscribed)
     await database.$transaction(async (tx) => {
       // 1. Update subscriber status to UNSUBSCRIBED
       const subscriber = await tx.subscriber.updateMany({
@@ -88,20 +234,29 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // 3. Create unsubscribe record for analytics
-      await tx.unsubscribeEvent.create({
-        data: {
+      // 3. Create unsubscribe record for analytics (only if not exists)
+      const existingEvent = await tx.unsubscribeEvent.findFirst({
+        where: {
           email: decodedEmail,
           newsLetterOwnerId: ownerId,
-          campaignId: campaignId || null,
-          reason: reason || 'User initiated',
-          source: source,
-          userAgent: request.headers.get('user-agent') || undefined,
-          ipAddress: request.headers.get('x-forwarded-for') || 
-                     request.headers.get('x-real-ip') || 
-                     'unknown',
-        },
+        }
       });
+
+      if (!existingEvent) {
+        await tx.unsubscribeEvent.create({
+          data: {
+            email: decodedEmail,
+            newsLetterOwnerId: ownerId,
+            campaignId: campaignId || null,
+            reason: reason || 'User initiated',
+            source: source,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || 
+                       request.headers.get('x-real-ip') || 
+                       'unknown',
+          },
+        });
+      }
 
       // 4. Update email analytics for the owner
       const activeEmails = await tx.email.findMany({
@@ -227,11 +382,11 @@ export async function GET(request: NextRequest) {
           <div class="container">
               <div class="success-icon">✓</div>
               <h1>You're Unsubscribed</h1>
-              <p>You have been successfully unsubscribed from all future emails from <strong>${newsletterOwner.SenderName }</strong>.</p>
+              <p>You have been successfully unsubscribed from all future emails from <strong>${newsletterOwner.SenderName || newsletterOwner.userName}</strong>.</p>
               
               <div class="info-box">
                   <p><strong>Email:</strong> ${decodedEmail}</p>
-                  <p><strong>Newsletter:</strong> ${newsletterOwner.SenderName }</p>
+                  <p><strong>Newsletter:</strong> ${newsletterOwner.SenderName || newsletterOwner.userName}</p>
                   ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
                   <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
               </div>
@@ -367,6 +522,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if already unsubscribed
+    const existingUnsubscribe = await database.unsubscribeEvent.findFirst({
+      where: {
+        email: email,
+        newsLetterOwnerId: user.userId,
+      }
+    });
+
+    const currentSubscriber = await database.subscriber.findFirst({
+      where: {
+        email: email,
+        newsLetterOwnerId: user.userId,
+      },
+      select: {
+        status: true,
+      }
+    });
+
+    const isAlreadyUnsubscribed = currentSubscriber?.status === 'UNSUBSCRIBED' || existingUnsubscribe;
+
+    if (isAlreadyUnsubscribed) {
+      return withCors(
+        { 
+          success: true, 
+          message: 'Subscriber was already unsubscribed',
+          email: email,
+          alreadyUnsubscribed: true
+        },
+        request,
+        200
+      );
+    }
+
     // Process unsubscribe for authenticated user (owner unsubscribing someone)
     await database.$transaction(async (tx) => {
       // Update subscriber status
@@ -399,17 +587,26 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Create unsubscribe event
-      await tx.unsubscribeEvent.create({
-        data: {
+      // Create unsubscribe event only if not exists
+      const existingEvent = await tx.unsubscribeEvent.findFirst({
+        where: {
           email: email,
           newsLetterOwnerId: user.userId,
-          reason: reason || 'Owner initiated',
-          source: source,
-          userAgent: request.headers.get('user-agent') || undefined,
-          ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        },
+        }
       });
+
+      if (!existingEvent) {
+        await tx.unsubscribeEvent.create({
+          data: {
+            email: email,
+            newsLetterOwnerId: user.userId,
+            reason: reason || 'Owner initiated',
+            source: source,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+          },
+        });
+      }
     });
 
     return withCors(

@@ -34,7 +34,7 @@ export function SubscribersDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list"); 
 
   const {
     subscribers,
@@ -43,7 +43,6 @@ export function SubscribersDashboard() {
     refetch: refetchSubscribers
   } = useSubscribers();
 
-  console.log(subscribers, 'data from subscriber')
 
   const filteredSubscribers = subscribers.filter((subscriber) => {
     const matchesSearch =
@@ -101,7 +100,7 @@ export function SubscribersDashboard() {
             </Button>
             <Button
               onClick={() => setShowAddDialog(true)}
-              className="bg-black hover:bg-white hover:text-black text-white font-medium w-full sm:w-auto"
+              className="bg-black hover:bg-white hover:text-black text-white font-medium w-fit "
               size="sm"
             >
               <UserPlus className="h-4 w-4 mr-2" /> Add Subscriber
