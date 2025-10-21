@@ -303,6 +303,39 @@ model ApiKey {
   user      User     @relation(fields: [userId], references: [userId])
 }
 
+
+model PlatformSubscriber {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String?
+  userId          String? 
+  source          String?  @default("platform_newsletter")
+  status          SubscriptionStatus @default(SUBSCRIBED)
+  unsubscribedAt  DateTime?
+  unsubscribeSource String?
+  unsubscribeReason String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("platform_subscribers")
+}
+
+model PlatformEmailEvent {
+  id          String   @id @default(cuid())
+  email       String
+  eventType   String   // OPEN, CLICK, UNSUBSCRIBE
+  trackingId  String?
+  metadata    Json?
+  userAgent   String?
+  ipAddress   String?
+  timestamp   DateTime @default(now())
+
+  @@map("platform_email_events")
+  @@index([email])
+  @@index([eventType])
+  @@index([timestamp])
+}
+
 model Kyc {
   id               String         @id @default(cuid())
   userId           String         @unique

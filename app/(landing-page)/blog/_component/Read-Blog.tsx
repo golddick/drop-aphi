@@ -2161,6 +2161,83 @@ export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
                     {isLiked ? post.likes + 1 : post.likes}
                   </Button>
 
+
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      handleCopyText(window.location.href)
+                      open('copy')
+                    }}
+                  >
+                    {copiedText === window.location.href ? (
+                      <Check className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Copy className="h-4 w-4 mr-2" />
+                    )}
+                    {copiedText === window.location.href ? "Copied!" : "Copy Link"}
+                  </Button>
+
+                  
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Featured Image */}
+            {post.featuredImage && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="mb-8"
+              >
+                <Image
+                  src={post.featuredImage}
+                  alt={post.title}
+                  width={1200}
+                  height={600}
+                  className="w-full rounded-lg object-cover h-96"
+                  priority
+                />
+              </motion.div>
+            )}
+
+            {/* Video Player */}
+            {post.featuredVideo && <VideoPlayer videoUrl={post.featuredVideo} />}
+
+            {/* Image Carousel */}
+            {post.galleryImages && post.galleryImages.length > 0 && (
+              <ImageCarousel images={post.galleryImages} />
+            )}
+
+            {/* Article Content */}
+            <motion.article
+              ref={contentRef}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-white rounded-2xl p-8 mb-12"
+            >
+              <div
+                className="prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={{
+                  __html: parseMarkdown(post.content),
+                }}
+              />
+            </motion.article>
+
+            <div>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant={isLiked ? "default" : "outline"}
+                    size="sm"
+                    onClick={handleLikePost}
+                    className={isLiked ? "bg-red-500 hover:bg-red-600 text-white" : ""}
+                  >
+                    <Heart className={`h-4 w-4 mr-2 ${isLiked ? "fill-current" : ""}`} />
+                    {isLiked ? post.likes + 1 : post.likes}
+                  </Button>
+
                   <Button
                     variant={isBookmarked ? "default" : "outline"}
                     size="sm"
@@ -2217,51 +2294,7 @@ export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
                     </Button>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Featured Image */}
-            {post.featuredImage && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="mb-8"
-              >
-                <Image
-                  src={post.featuredImage}
-                  alt={post.title}
-                  width={1200}
-                  height={600}
-                  className="w-full rounded-lg object-cover h-96"
-                  priority
-                />
-              </motion.div>
-            )}
-
-            {/* Video Player */}
-            {post.featuredVideo && <VideoPlayer videoUrl={post.featuredVideo} />}
-
-            {/* Image Carousel */}
-            {post.galleryImages && post.galleryImages.length > 0 && (
-              <ImageCarousel images={post.galleryImages} />
-            )}
-
-            {/* Article Content */}
-            <motion.article
-              ref={contentRef}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white rounded-2xl p-8 mb-12"
-            >
-              <div
-                className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: parseMarkdown(post.content),
-                }}
-              />
-            </motion.article>
+            </div>
 
             {/* Newsletter Subscription */}
         <SubscribeWidget
@@ -2271,21 +2304,6 @@ export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {
           variant="inline"
           className="mb-12"
         />
-
-            {/* Media Gallery */}
-            {/* {(post.galleryImages?.length > 0 || post.featuredVideo) && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="mb-12"
-              >
-                <MediaGallery 
-                  images={post.galleryImages || []} 
-                  video={post.featuredVideo || null}
-                />
-              </motion.div>
-            )} */}
 
             {/* Comments Section */}
             <motion.div

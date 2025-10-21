@@ -191,7 +191,9 @@ export function BlogSidebar() {
           <p className="text-neutral-300 text-sm mb-4">
             Our team of experts can help you create, optimize, and grow your newsletter.
           </p>
+          <Link href="/book-consultation">
           <Button className="bg-red-600 text-white hover:bg-black">Book a Consultation</Button>
+          </Link>
         </div>
       </motion.div>
 

@@ -93,14 +93,14 @@ export function AddSubscriberDialog({
     try {
       const payload = {
         email: formData.email,
-        name: formData.name || undefined,
+        name: formData.name || formData.email.split('@')[0],
         source: formData.source,
         status: formData.status,
         pageUrl: formData.pageUrl || undefined,
       };
 
       const result = await addSubscriber(payload);
-          // ✅ Handle KYC-required error from server
+          // ✅ Handle KYC-required error from server 
       if (result?.code === "KYC_REQUIRED") {
         toast.error("KYC verification required before managing subscribers.", {
           description: "Redirecting you to the KYC verification tab...",

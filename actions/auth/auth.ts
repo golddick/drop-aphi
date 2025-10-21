@@ -65,7 +65,8 @@ export async function registerUser(formData: SignupFormData): Promise<SignupResu
         userId: generateCustomUserId(),
         fullName: fullName.trim(),
         userName: userName.trim(),
-        email: email.toLowerCase(),
+        email: email.toLowerCase(), 
+        termsAndConditionsAccepted: true, 
         password: hashedPassword,
         isEmailVerified: false, // Pending OTP verification
       },

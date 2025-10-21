@@ -85,7 +85,6 @@ export function OverviewMetrics({ timeRange }: OverviewMetricsProps) {
           getTopBlogs(timeRange)
         ])
 
-        console.log(growth, performance, blogPerf, campaigns, blogs, 'Loading...')
 
         // Type assertions to ensure proper typing
         setGrowthData(growth as GrowthDataResponse)
@@ -93,8 +92,6 @@ export function OverviewMetrics({ timeRange }: OverviewMetricsProps) {
         setBlogPerformance(blogPerf as BlogPerformanceResponse)
         setTopCampaigns(campaigns as TopCampaignsResponse)
         setTopBlogs(blogs as TopBlogsResponse)
-
-        console.log(growthData, performanceData, blogPerformance, topCampaigns, topBlogs, 'Fetched...')
 
         // Show banner if all data is empty
         const allEmpty = 
@@ -137,34 +134,6 @@ export function OverviewMetrics({ timeRange }: OverviewMetricsProps) {
     )
   }
 
-  // Empty state banner
-  const EmptyStateBanner = () => (
-    <Alert className="mb-6 bg-blue-50 border-blue-200">
-      <AlertCircle className="h-4 w-4 text-blue-600" />
-      <AlertDescription className="text-blue-800">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p className="font-semibold mb-1">Welcome to your analytics dashboard!</p>
-            <p>Get started by creating content and engaging with your audience to see analytics data.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/dashboard/mail/write">
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                <Mail className="h-4 w-4 mr-2" />
-                Create Campaign
-              </Button>
-            </Link>
-            <Link href="/dashboard/blog/write">
-              <Button size="sm" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
-                <FileText className="h-4 w-4 mr-2" />
-                Write Blog Post
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </AlertDescription>
-    </Alert>
-  )
 
   // Empty state component for charts
   const EmptyChartState = ({ icon: Icon, title, message, action }: { 
@@ -238,8 +207,7 @@ export function OverviewMetrics({ timeRange }: OverviewMetricsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Empty State Banner */}
-      {showEmptyStateBanner && <EmptyStateBanner />}
+
 
       {/* Growth Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

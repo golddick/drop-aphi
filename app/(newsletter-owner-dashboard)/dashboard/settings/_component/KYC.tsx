@@ -270,7 +270,7 @@ export default function KYCPage() {
     try {
       setIsUploading("level-1")
       
-      const result = await startKYCProcess(accountType, user.id)
+      const result = await startKYCProcess(accountType, user.userId)
 
       if (!result.success) {
         throw new Error(result.error || "Failed to start KYC")
