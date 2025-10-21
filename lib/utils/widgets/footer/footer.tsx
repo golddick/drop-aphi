@@ -33,7 +33,7 @@ export default function Footer() {
               <h4 className="font-bold mb-4 text-white">Product</h4>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li>
-                  <Link href="#features" className="hover:text-yellow-600 transition-colors">
+                  <Link href="/#features" className="hover:text-yellow-600 transition-colors">
                     Features
                   </Link>
                 </li>
@@ -47,11 +47,11 @@ export default function Footer() {
                     Documentation
                   </Link>
                 </li>
-                {/* <li>
-                  <Link href="/api-reference" className="hover:text-yellow-600 transition-colors">
-                    API Reference
+                <li>
+                  <Link href="/#api" className="hover:text-yellow-600 transition-colors">
+                    API 
                   </Link>
-                </li> */}
+                </li>
               </ul>
             </div>
 
@@ -73,11 +73,11 @@ export default function Footer() {
                     Careers
                   </Link>
                 </li>
-                {/* <li>
+                <li>
                   <Link href="/contact" className="hover:text-yellow-600 transition-colors">
                     Contact
                   </Link>
-                </li> */}
+                </li>
               </ul>
             </div>
 
@@ -120,11 +120,11 @@ export default function Footer() {
                     Terms of Service
                   </Link>
                 </li>
-                {/* <li>
+                <li>
                   <Link href="/security" className="hover:text-yellow-600 transition-colors">
                     Security
                   </Link>
-                </li> */}
+                </li>
                 <li>
                   <Link href="/cookies" className="hover:text-yellow-600 transition-colors">
                     Cookie Policy
