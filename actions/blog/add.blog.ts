@@ -154,7 +154,7 @@ import { notifySubscribersAboutNewPost } from './notify';
 import { ensurePublishingAllowed, handlePostPublishActions } from './blogPostPublishing';
 import { getServerAuth } from '@/lib/auth/getauth';
 import { database } from '@/lib/database';
-import { KYCStatus } from '@prisma/client';
+import { BlogTemplate, KYCStatus } from '@prisma/client';
 
 
 type CreateBlogPostResult = {
@@ -250,6 +250,7 @@ export async function createBlogPost(formData: {
         title: formData.title,
         subtitle: formData.subtitle,
         authorBio: formData.authorBio,
+        template:BlogTemplate.CLASSIC,
         author: formData.author,
         authorTitle: formData.authorTitle,
         slug,

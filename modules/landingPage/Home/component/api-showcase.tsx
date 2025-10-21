@@ -88,7 +88,7 @@ export default function APIShowcase() {
         <div className="text-center mb-20">
           <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
             <span className="text-black">Three Powerful APIs,</span>{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 to-red-600">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-600">
               Endless Possibilities
             </span>
           </h2>

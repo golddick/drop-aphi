@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import Toolbar from "@/lib/utils/widgets/header/toolbar"
-import Logo from "@/lib/utils/widgets/header/logo" 
+import Logo from "@/lib/utils/widgets/header/logo"
 
 interface HeaderProps {
   mobileMenuOpen: boolean
@@ -106,12 +106,12 @@ export default function Header({ mobileMenuOpen, setMobileMenuOpen }: HeaderProp
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 animate-slide-in-down">
           <div className="px-4 py-4 space-y-2">
-          <NavLink href="/#features">Features</NavLink>
-          <NavLink href="/#api">APIs</NavLink>
-          <NavLink href="/about-us">About Us</NavLink>
-          <NavLink href="/blog">Blog</NavLink>
-          <NavLink href="/pricing">Price</NavLink>
-          <NavLink href="/docs">Doc</NavLink>
+            <MobileNavLink href="/#features">Features</MobileNavLink>
+            <MobileNavLink href="/#api">APIs</MobileNavLink>
+            <MobileNavLink href="/about-us">About Us</MobileNavLink>
+            <MobileNavLink href="/blog">Blog</MobileNavLink>
+            <MobileNavLink href="/pricing">Price</MobileNavLink>
+            <MobileNavLink href="/docs">Doc</MobileNavLink>
             <div className="pt-4 space-y-2 border-t border-gray-200">
               <Toolbar />
             </div>

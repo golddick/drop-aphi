@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Mail, Github, Twitter, Linkedin } from "lucide-react"
 import NewsletterSignup from "./newsletter-signup"
+import Logo from "../header/logo"
 
 export default function Footer() {
   return (
@@ -20,21 +21,19 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-yellow-600 rounded-lg flex items-center justify-center">
-                  <span className="text-black font-bold text-sm">DA</span>
-                </div>
-                <span className="font-bold text-lg">DropAphi</span>
+                   <Logo />
               </div>
               <p className="text-gray-400 text-sm">
                 Unified communication platform for developers and content creators.
               </p>
             </div>
 
-            <div>
+          <div className=" grid grid-cols-3 md:grid-cols-3 gap-4" >
+              <div>
               <h4 className="font-bold mb-4 text-white">Product</h4>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li>
-                  <Link href="/features" className="hover:text-yellow-600 transition-colors">
+                  <Link href="#features" className="hover:text-yellow-600 transition-colors">
                     Features
                   </Link>
                 </li>
@@ -48,11 +47,11 @@ export default function Footer() {
                     Documentation
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href="/api-reference" className="hover:text-yellow-600 transition-colors">
                     API Reference
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
 
@@ -60,7 +59,7 @@ export default function Footer() {
               <h4 className="font-bold mb-4 text-white">Company</h4>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li>
-                  <Link href="/about" className="hover:text-yellow-600 transition-colors">
+                  <Link href="/about-us" className="hover:text-yellow-600 transition-colors">
                     About
                   </Link>
                 </li>
@@ -74,15 +73,15 @@ export default function Footer() {
                     Careers
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href="/contact" className="hover:text-yellow-600 transition-colors">
                     Contact
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
 
-            <div>
+            {/* <div>
               <h4 className="font-bold mb-4 text-white">Resources</h4>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li>
@@ -106,9 +105,9 @@ export default function Footer() {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
 
-            <div>
+            <div >
               <h4 className="font-bold mb-4 text-white">Legal</h4>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li>
@@ -121,11 +120,11 @@ export default function Footer() {
                     Terms of Service
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href="/security" className="hover:text-yellow-600 transition-colors">
                     Security
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link href="/cookies" className="hover:text-yellow-600 transition-colors">
                     Cookie Policy
@@ -133,6 +132,8 @@ export default function Footer() {
                 </li>
               </ul>
             </div>
+
+          </div>
           </div>
 
           <div className="border-t border-gray-800 pt-8">
