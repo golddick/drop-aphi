@@ -11,16 +11,16 @@ export function nestComments(
 
   // Step 1: Create a map of all comments (without nesting)
   for (const comment of flatComments) {
-    commentMap.set(comment.id, {
+    commentMap.set(comment.id, { 
       id: comment.id,
-      author: comment.member.userName || comment.member.userName,
-      authorAvatar: comment.member.imageUrl ||"",
+      author: comment.user,
+      authorAvatar: comment.user.imageUrl ||"",
       date: formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true }),
       content: comment.content,
       likes: comment.likes,
       isLiked: false,
       replies: [],
-      isAuthor: comment.member.userId === currentAuthorId,
+      isAuthor: comment.user.userId === currentAuthorId,
     });
   }
 

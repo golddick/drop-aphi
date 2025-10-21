@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     const result = await addSubscriber({
       email,
-      name,
+      name: name || email.split('@')[0],
       source,
       status: SubscriptionStatus.SUBSCRIBED,
       pageUrl,

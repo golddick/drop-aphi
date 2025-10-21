@@ -14,7 +14,7 @@ import { cancelSubscription, downgradeToFreePlan, getBillingHistory, getCurrentS
 import { availablePlans } from "@/lib/planLimit"
 import { useRouter } from "next/navigation"
 import { paystackSubscribe } from "@/actions/paystack/paystack.subscribe"
-import { Plan } from "@/lib/generated/prisma"
+import { Plan } from "@/lib/generated/prisma" 
 import { useAuthUser } from "@/lib/auth/getClientAuth"
 import { toast } from "sonner"
 import Loader from "@/components/_component/Loader"

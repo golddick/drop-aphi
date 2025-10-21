@@ -1,119 +1,161 @@
 "use client"
 
-import type React from "react"
-import { motion, Variants } from "framer-motion"
 import Link from "next/link"
-import {  Instagram, Mail } from "lucide-react"
-import { FaWhatsapp } from "react-icons/fa6"
+import { Mail, Github, Twitter, Linkedin } from "lucide-react"
+import NewsletterSignup from "./newsletter-signup"
 
-
-export function Footer() {
-
-  const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-}
-
-const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 10,
-    },
-  },
-}
-
-
+export default function Footer() {
   return (
-    <footer className="bg-black text-white  border-none pt-16 pb-8">
-      <div className="container mx-auto px-4">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid md:grid-cols-4 gap-10"
-        >
-          <motion.div variants={itemVariants} className="md:col-span-2">
-            <Link href="/" className="inline-block mb-6">
-              <span className="text-2xl font-bold">
-                <span className="text-gold-700 font-heading">The</span>
-                <span className="text-white font-heading">News</span>
-              </span>
-            </Link>
-            <p className="text-neutral-300 mb-6 max-w-md leading-relaxed">
-              DROPAPHI helps you create, send, and analyze beautiful newsletters that engage your audience and grow your
-              business.
-            </p>
-            <div className="flex space-x-4">
-              <SocialLink href="https://wa.me/+2347050998742" icon={<FaWhatsapp size={18} />} />
-              <SocialLink href="https://www.instagram.com/thenews.africa/" icon={<Instagram size={18} />} />
-              <SocialLink href="mailto:info@thenews.africa" icon={<Mail size={18} />} />
+    <footer className="bg-black text-white">
+      {/* Newsletter Section */}
+      <div className="px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto">
+          <NewsletterSignup />
+        </div>
+      </div>
+
+      {/* Main Footer */}
+      <div className="px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-yellow-600 rounded-lg flex items-center justify-center">
+                  <span className="text-black font-bold text-sm">DA</span>
+                </div>
+                <span className="font-bold text-lg">DropAphi</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Unified communication platform for developers and content creators.
+              </p>
             </div>
-          </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <h4 className="text-lg font-bold mb-5 text-white">Company</h4>
-            <ul className="space-y-3">
-              <FooterLink href="/about">About</FooterLink>
-              <FooterLink href="/coming-soon">Blog</FooterLink>
-              <FooterLink href="#pricing">Pricing</FooterLink>
-            </ul>
-          </motion.div>
+            <div>
+              <h4 className="font-bold mb-4 text-white">Product</h4>
+              <ul className="space-y-3 text-gray-400 text-sm">
+                <li>
+                  <Link href="/features" className="hover:text-yellow-600 transition-colors">
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="hover:text-yellow-600 transition-colors">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs" className="hover:text-yellow-600 transition-colors">
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/api-reference" className="hover:text-yellow-600 transition-colors">
+                    API Reference
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          <motion.div variants={itemVariants}>
-            <h4 className="text-lg font-bold mb-5 text-white">Subscribe</h4>
-            <p className="text-neutral-300 mb-4">Get the latest news and updates from TheNews.</p>
-           {/* <FooterNewsLetter/> */}
-          </motion.div>
-        </motion.div>
+            <div>
+              <h4 className="font-bold mb-4 text-white">Company</h4>
+              <ul className="space-y-3 text-gray-400 text-sm">
+                <li>
+                  <Link href="/about" className="hover:text-yellow-600 transition-colors">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog" className="hover:text-yellow-600 transition-colors">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/careers" className="hover:text-yellow-600 transition-colors">
+                    Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-yellow-600 transition-colors">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-        <motion.div
-          variants={itemVariants}
-          className="border-t border-dark-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
-        >
-          <p className="text-neutral-400 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} TheNews. All rights reserved.
-          </p>
-          <div className="flex space-x-6">
-            <Link href="/legal" className="text-neutral-400 text-sm hover:text-gold-300 transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/legal" className="text-neutral-400 text-sm hover:text-gold-300 transition-colors">
-              Terms of Service
-            </Link>
+            <div>
+              <h4 className="font-bold mb-4 text-white">Resources</h4>
+              <ul className="space-y-3 text-gray-400 text-sm">
+                <li>
+                  <Link href="/guides" className="hover:text-yellow-600 transition-colors">
+                    Guides
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/community" className="hover:text-yellow-600 transition-colors">
+                    Community
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/status" className="hover:text-yellow-600 transition-colors">
+                    Status
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/support" className="hover:text-yellow-600 transition-colors">
+                    Support
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-4 text-white">Legal</h4>
+              <ul className="space-y-3 text-gray-400 text-sm">
+                <li>
+                  <Link href="/privacy" className="hover:text-yellow-600 transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-yellow-600 transition-colors">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/security" className="hover:text-yellow-600 transition-colors">
+                    Security
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cookies" className="hover:text-yellow-600 transition-colors">
+                    Cookie Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
-        </motion.div>
+
+          <div className="border-t border-gray-800 pt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-gray-400 text-sm">© 2025 DropAphi. All rights reserved.</p>
+              <div className="flex items-center gap-4">
+                <Link href="#" className="text-gray-400 hover:text-yellow-600 transition-colors">
+                  <Twitter className="w-5 h-5" />
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-yellow-600 transition-colors">
+                  <Github className="w-5 h-5" />
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-yellow-600 transition-colors">
+                  <Linkedin className="w-5 h-5" />
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-yellow-600 transition-colors">
+                  <Mail className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
-  )
-}
-
-function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="w-9 h-9 flex items-center justify-center rounded-full bg-dark-700 text-neutral-300 hover:bg-gold-500/20 hover:text-gold-300 transition-colors"
-    >
-      {icon}
-    </Link>
-  )
-}
-
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <li>
-      <Link href={href} className="text-neutral-300 hover:text-gold-300 transition-colors">
-        {children}
-      </Link>
-    </li>
   )
 }

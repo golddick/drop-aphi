@@ -1,9 +1,10 @@
 import React from 'react'
+import ProfilePage from './pofile'
 
 const UserProfile = () => {
   return (
     <div>
-      my page
+      <ProfilePage/>
     </div>
   )
 }

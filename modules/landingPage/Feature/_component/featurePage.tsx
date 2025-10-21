@@ -5,8 +5,8 @@ import { EmailVerification } from "./email-verification";
 import { NewsletterBuilder } from "./newsletter-builder";
 import { NotificationSystem } from "./notification-system";
 import { OTPSystem } from "./otp-system";
-import { Footer } from "@/lib/utils/widgets/footer/footer";
 import Header from "@/lib/utils/widgets/header";
+import Footer from "@/lib/utils/widgets/footer/footer";
 
 
 export default function FeaturesPage() {

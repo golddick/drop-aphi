@@ -24,6 +24,7 @@ import { UserPlus, AlertCircle } from "lucide-react";
 import { addSubscriber } from "@/actions/subscriber/add.subscriber";
 import { SubscriptionStatus } from "@/lib/generated/prisma";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 
 interface AddSubscriberDialogProps {
@@ -69,6 +70,7 @@ export function AddSubscriberDialog({
     pageUrl: "",
   });
 
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -98,6 +100,18 @@ export function AddSubscriberDialog({
       };
 
       const result = await addSubscriber(payload);
+          // ✅ Handle KYC-required error from server
+      if (result?.code === "KYC_REQUIRED") {
+        toast.error("KYC verification required before managing subscribers.", {
+          description: "Redirecting you to the KYC verification tab...",
+        });
+
+        setTimeout(() => {
+          router.push("/dashboard/settings?tab=kyc"); 
+        }, 2000);
+
+        return;
+      }
       if (!result.success) throw new Error(result.error);
 
       toast.success("Subscriber added successfully!");

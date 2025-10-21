@@ -219,7 +219,7 @@ export function BlogList() {
                   <Link href={`/blog/${post.slug}`} className="block">
                     <div className="relative overflow-hidden rounded-lg aspect-[4/3]">
                       <Image
-                        src={post.featuredImage || "/placeholder.svg"}
+                        src={post.featuredImage || "/no-img.jpg"}
                         alt={post.title}
                         width={500}
                         height={300}

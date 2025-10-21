@@ -4,9 +4,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { calculatePerformanceScore } from '@/lib/utils';
-import { PostStatus, Prisma } from '@/lib/generated/prisma';
 import { database } from '@/lib/database';
 import { getServerAuth } from '@/lib/auth/getauth';
+import { FeaturedPost, GetFeaturedPostsResponse } from '@/type';
+import { PostStatus, Prisma } from '@prisma/client';
 
 // Types
 export type BlogPostWithRelations = Prisma.BlogPostGetPayload<{
@@ -65,6 +66,7 @@ export async function getBlogPosts({
 
     const where: Prisma.BlogPostWhereInput = {
       status,
+      isFeatured:false,
       ...(authorId && { authorId }),
     };
 
@@ -375,23 +377,6 @@ export async function getBlogTags() {
 
 // Get featured posts
 
-interface FeaturedPost {
-  id: string
-  title: string
-  slug: string
-  excerpt?: string | null
-  featuredImage: string
-  publishedAt: Date // Non-nullable
-  readTime?: number | null
-  category?: { name: string } | null
-  tags?: { name: string }[]
-}
-
-interface GetFeaturedPostsResponse {
-  success: boolean
-  data?: FeaturedPost[]
-  error?: string
-}
 
 export async function getFeaturedPosts(limit = 4): Promise<GetFeaturedPostsResponse> {
   try {
@@ -399,7 +384,7 @@ export async function getFeaturedPosts(limit = 4): Promise<GetFeaturedPostsRespo
       where: {
         status: 'PUBLISHED',
         isFeatured: true,
-        publishedAt: { not: null } // Only include posts with publishedAt
+        publishedAt: { not: null }
       },
       take: limit,
       orderBy: {
@@ -413,6 +398,14 @@ export async function getFeaturedPosts(limit = 4): Promise<GetFeaturedPostsRespo
         featuredImage: true,
         publishedAt: true,
         readTime: true,
+        author: true,
+        // Add comments and likes
+        comments: {
+          select: {
+            id: true
+          }
+        },
+        likes: true,
         category: {
           select: {
             name: true
@@ -428,11 +421,13 @@ export async function getFeaturedPosts(limit = 4): Promise<GetFeaturedPostsRespo
 
     // Filter out any posts that somehow got through without publishedAt
     // and transform the data
-    const transformedPosts = posts
+    const transformedPosts: FeaturedPost[] = posts
       .filter(post => post.publishedAt !== null)
       .map(post => ({
         ...post,
-        publishedAt: post.publishedAt as Date, // We've filtered out nulls
+        publishedAt: post.publishedAt as Date,
+        comments: post.comments || [],
+        likes: post.likes || 0,
         category: post.category ? { name: post.category.name } : null,
         tags: post.tags.map(tag => ({ name: tag.name }))
       }))
@@ -449,6 +444,81 @@ export async function getFeaturedPosts(limit = 4): Promise<GetFeaturedPostsRespo
     }
   }
 }
+
+//  interface FeaturedPost {
+//   id: string
+//   title: string
+//   slug: string
+//   excerpt?: string | null
+//   featuredImage: string
+//   publishedAt: Date // Non-nullable
+//   readTime?: number | null
+//   category?: { name: string } | null
+//   tags?: { name: string }[]
+// }
+
+// interface GetFeaturedPostsResponse {
+//   success: boolean
+//   data?: FeaturedPost[]
+//   error?: string
+// }
+
+// export async function getFeaturedPosts(limit = 4): Promise<GetFeaturedPostsResponse> {
+//   try {
+//     const posts = await database.blogPost.findMany({
+//       where: {
+//         status: 'PUBLISHED',
+//         isFeatured: true,
+//         publishedAt: { not: null } // Only include posts with publishedAt
+//       },
+//       take: limit,
+//       orderBy: {
+//         publishedAt: 'desc',
+//       },
+//       select: {
+//         id: true,
+//         title: true,
+//         slug: true,
+//         excerpt: true,
+//         featuredImage: true,
+//         publishedAt: true,
+//         readTime: true,
+//         category: {
+//           select: {
+//             name: true
+//           }
+//         },
+//         tags: {
+//           select: {
+//             name: true
+//           }
+//         }
+//       }
+//     })
+
+//     // Filter out any posts that somehow got through without publishedAt
+//     // and transform the data
+//     const transformedPosts = posts
+//       .filter(post => post.publishedAt !== null)
+//       .map(post => ({
+//         ...post,
+//         publishedAt: post.publishedAt as Date, // We've filtered out nulls
+//         category: post.category ? { name: post.category.name } : null,
+//         tags: post.tags.map(tag => ({ name: tag.name }))
+//       }))
+
+//     return { 
+//       success: true, 
+//       data: transformedPosts 
+//     }
+//   } catch (error) {
+//     console.error('Error fetching featured posts:', error)
+//     return {
+//       success: false,
+//       error: error instanceof Error ? error.message : 'Failed to fetch featured posts',
+//     }
+//   }
+// }
 
 // Get related posts
 export async function getRelatedPosts(postId: string, limit = 3)

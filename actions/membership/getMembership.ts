@@ -56,8 +56,6 @@
 
 
 
-
-
 'use server';
 
 import { getServerAuth } from "@/lib/auth/getauth";
@@ -88,6 +86,7 @@ export async function getMembership() {
       id: membership.id,
       userId: membership.userId,
       userName: membership.userName,
+      fullName: membership.fullName,
       plan: membership.plan,
       role: membership.role,
       subscriptionStatus: membership.subscriptionStatus,
@@ -107,9 +106,49 @@ export async function getMembership() {
       createdAt: membership.createdAt.toISOString(),
       updatedAt: membership.updatedAt.toISOString(),
       termsAndConditionsAccepted: membership.termsAndConditionsAccepted,
+      profileImage: membership.imageUrl,
     };
   } catch (error) {
     console.error('Error fetching membership:', error);
     throw new Error('Failed to fetch membership details');
+  }
+}
+
+export async function updateProfile(data: {
+  userName: string;
+  organization: string;
+  fullName: string;
+  profileImage?: string;
+}) {
+  try {
+    const user = await getAuthenticatedUser();
+
+    const updatedUser = await database.user.update({
+      where: { userId: user.userId },
+      data: {
+        userName: data.userName,
+        organization: data.organization,
+        fullName: data.fullName,
+        imageUrl: data.profileImage,
+        updatedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      user: {
+        id: updatedUser.id,
+        userName: updatedUser.userName,
+        fullName: updatedUser.fullName,
+        organization: updatedUser.organization,
+        profileImage: updatedUser.imageUrl,
+      }
+    };
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return {
+      success: false,
+      error: 'Failed to update profile'
+    };
   }
 }

@@ -173,6 +173,13 @@ enum RecipientStatus {
   COMPLAINED
 }
 
+enum BlogTemplate {
+  DEFAULT
+  CLASSIC
+  MODERN
+
+}
+
 
 
 model User {
@@ -349,6 +356,7 @@ model BlogPost {
   slug           String            @unique
   content        String
   excerpt        String?
+  template       BlogTemplate     @default(DEFAULT)
   format         ContentFormat     @default(MARKDOWN)
   status         PostStatus        @default(DRAFT)
   visibility     PostVisibility    @default(PUBLIC)
@@ -801,4 +809,6 @@ model EmailAnalytics {
   email              Email    @relation(fields: [emailId], references: [id], onDelete: Cascade)
   
   @@index([emailId])
+
+
 }

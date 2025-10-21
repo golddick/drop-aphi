@@ -5,6 +5,7 @@ import { getServerAuth } from "@/lib/auth/getauth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/lib/utils/widgets/header/logo";
+import { cookies } from "next/headers";
 
 
 export const metadata: Metadata = {
@@ -22,6 +23,9 @@ export default async function AuthLayout({
       if (!user) {
           redirect('/auth');
       }
+
+       const cookieStore = await cookies()
+  const token = cookieStore.get('auth-token')?.value
   
   return (
     <>

@@ -7,8 +7,8 @@ interface NewPostTemplateParams {
   subtitle?: string;
   excerpt?: string;
   url: string;
-  HostPlatformUrl: string;
-  HostPlatform: string;
+  platformUrl: string;
+  platformName: string;
   featuredImage?: string | null;
 }
 
@@ -20,177 +20,57 @@ export function newPostNotificationTemplate({
   url,
   featuredImage,
   platform,
-  HostPlatformUrl,
-  HostPlatform
+  platformUrl,
+  platformName
 }: NewPostTemplateParams) {
-  return {
-    title: `New Post: ${title}`,
-    content: {
-      subject: `New Post Alert: ${title} - ${platform}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body {
-              font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              background-color: #ffffff;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 24px;
-              background: #ffffff;
-              border-radius: 8px;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-              text-align: center;
-              color: #111;
-            }
-            .badge {
-              display: inline-block;
-              background: #000;
-              color: #DC2626;
-              padding: 6px 12px;
-              border-radius: 16px;
-              font-size: 12px;
-              font-weight: 600;
-              margin-bottom: 20px;
-            }
-            h1 {
-              font-size: 20px;
-              font-weight: bold;
-              color: #000;
-              margin: 12px 0 6px;
-              line-height: 1.3;
-            }
-            h2 {
-              font-size: 15px;
-              color: #555;
-              font-weight: 300;
-              margin: 0 0 12px;
-              line-height: 1.4;
-            }
-            p {
-              font-size: 14px;
-              color: #333;
-              margin: 8px 0;
-              line-height: 1.6;
-            }
-            .author {
-              color: #777;
-              font-size: 13px;
-              margin: 0 0 16px;
-            }
-            .excerpt {
-              background: #FBF8E9;
-              border-left: 4px solid #DC2626;
-              border-radius: 4px;
-              padding: 12px;
-              margin-bottom: 16px;
-              display: inline-block;
-              text-align: left;
-              max-width: 90%;
-            }
-            .excerpt p {
-              color: #333;
-              font-size: 14px;
-              line-height: 1.5;
-              margin: 0;
-            }
-            .button {
-              display: inline-block;
-              background: #000;
-              color: #DC2626;
-              padding: 10px 22px;
-              border-radius: 4px;
-              text-decoration: none;
-              font-weight: 600;
-              font-size: 14px;
-              text-align: center;
-              margin-bottom: 20px;
-            }
-            .platform-link {
-              margin: 20px 0;
-              color: #555;
-              font-size: 13px;
-            }
-            .platform-link a {
-              color: #000;
-              font-weight: 500;
-              text-decoration: underline;
-            }
-            .footer {
-              border-top: 1px solid #e5e5e5;
-              padding-top: 12px;
-              color: #999;
-              font-size: 10px;
-              line-height: 1.5;
-            }
-            .highlight {
-              color: #DC2626;
-              text-decoration: underline;
-              font-weight: 600;
-            }
-            .underline {
-              text-decoration: underline;
-              color: #DC2626;
-            }
-            .featured-image {
-              max-width: 100%;
-              max-height: 200px;
-              margin: 0 auto 16px;
-              border-radius: 6px;
-              object-fit: cover;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <p class="badge">New Blog Post Alert!</p>
-            
-            <p style="font-size: 14px; color: #333; margin: 0 0 12px; line-height: 1.5;">
-              Hey there! A new blog post has just been published by <strong class="highlight">${platform}</strong>. 
-              Here's a sneak peek of what's inside:
-            </p>
+  const subject = `New Post: ${title}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #000; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0; color: #DC2626;">New Blog Post Alert!</h1>
+      </div>
+      <div style="padding: 30px; background: #f9f9f9;">
+        <h2 style="color: #333; margin-bottom: 10px;">Hey there!</h2>
+        <p style="color: #666; line-height: 1.6;">
+          A new blog post has just been published by <strong>${platform}</strong>. 
+          Here's a sneak peek of what's inside:
+        </p>
 
-            <h1>${title}</h1>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #DC2626;">
+          <h3 style="color: #000; margin: 0 0 8px 0; font-size: 18px;">${title}</h3>
+          ${subtitle ? `<p style="color: #666; margin: 0 0 12px 0; font-style: italic;">${subtitle}</p>` : ''}
+          <p style="color: #888; margin: 0 0 8px 0; font-size: 14px;">
+            By <strong>${author}</strong>
+          </p>
+          ${excerpt ? `<p style="color: #333; margin: 12px 0 0 0; line-height: 1.5;">${excerpt}</p>` : ''}
+        </div>
 
-            ${subtitle ? `<h2>${subtitle}</h2>` : ''}
-
-            <p class="author">
-              Author <span style="color: #000; font-weight: 600;">${author}</span>
-            </p>
-
-            ${featuredImage ? `
-              <div style="text-align: center; margin-bottom: 16px;">
-                <img src="${featuredImage}" alt="${title}" class="featured-image" />
-              </div>
-            ` : ''}
-
-            ${excerpt ? `
-              <div class="excerpt">
-                <p>${excerpt}</p>
-              </div>
-            ` : ''}
-
-            <div>
-              <a href="${url}" class="button">Read Full Post</a>
-            </div>
-
-            <div class="platform-link">
-              <a href="${HostPlatformUrl}">Explore more on ${HostPlatform}</a>
-            </div>
-
-            <div class="footer">
-              <p>You are receiving this email because you subscribed to updates from <span class="underline">${platform}</span>.</p>
-            </div>
+        ${featuredImage ? `
+          <div style="text-align: center; margin: 20px 0;">
+            <img src="${featuredImage}" alt="${title}" style="max-width: 100%; max-height: 200px; border-radius: 6px;" />
           </div>
-        </body>
-        </html>
-      `,
-      text: `
+        ` : ''}
+
+        <div style="text-align: center; margin: 25px 0;">
+          <a href="${url}" style="background: #000; color: #DC2626; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+            Read Full Post
+          </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="${platformUrl}" style="color: #000; text-decoration: underline;">
+            Explore more on ${platformName}
+          </a>
+        </div>
+      </div>
+      <div style="padding: 20px; text-align: center; color: #666; font-size: 12px; border-top: 1px solid #e5e5e5;">
+        <p>You are receiving this email because you subscribed to updates from <strong>${platform}</strong>.</p>
+      </div>
+    </div>
+  `;
+
+  const text = `
 New Blog Post Alert!
 
 Hey there! A new blog post has just been published by ${platform}. Here's a sneak peek of what's inside:
@@ -202,10 +82,13 @@ ${excerpt ? `Excerpt: ${excerpt}\n` : ''}
 
 Read the full post: ${url}
 
-Explore more on ${HostPlatform}: ${HostPlatformUrl}
+Explore more on ${platformName}: ${platformUrl}
 
 You are receiving this email because you subscribed to updates from ${platform}.
-      `.trim()
-    }
+  `.trim();
+
+  return {
+    title: subject,
+    content: { html, text }
   };
 }

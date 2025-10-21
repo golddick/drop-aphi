@@ -493,6 +493,11 @@ export function BlogWriteEditor() {
         result = await updateBlogPost(existingPost.id, user.id, formData);
       } else {
         result = await createBlogPost(formData);
+        if (result.kycRequired) {
+        // Redirect to KYC page or show KYC modal
+        router.push('/dashboard/settings?tab=kyc');
+        return;
+      }
       }
 
       if (result.success) {

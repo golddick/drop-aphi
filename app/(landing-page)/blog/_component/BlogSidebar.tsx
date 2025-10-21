@@ -112,23 +112,6 @@ export function BlogSidebar() {
       animate={isInView ? "visible" : "hidden"}
       className="space-y-8"
     >
-      {/* Newsletter Subscription */}
-      <motion.div variants={itemVariants} className="bg-neutral-50 rounded-xl p-6 border border-neutral-100">
-        <h3 className="text-lg font-bold mb-4">Subscribe to Our Newsletter</h3>
-        <p className="text-neutral-600 text-sm mb-4">
-          Get the latest articles, tips, and insights delivered straight to your inbox.
-        </p>
-        <div className="space-y-3">
-          <Input
-            type="email"
-            placeholder="Your email address"
-            className="border-neutral-200 focus-visible:ring-gold-500"
-          />
-          <Button className="w-full bg-gold-500 hover:bg-gold-600">
-            Subscribe <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      </motion.div>
 
       {/* Categories */}
       <motion.div variants={itemVariants} className="bg-neutral-50 rounded-xl p-6 border border-neutral-100">
@@ -201,14 +184,14 @@ export function BlogSidebar() {
       </motion.div>
 
       {/* CTA */}
-      <motion.div variants={itemVariants} className="bg-dark-800 text-white rounded-xl p-6 overflow-hidden relative">
+      <motion.div variants={itemVariants} className="bg-black text-white rounded-xl p-6 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-32 h-32 bg-gold-500/20 rounded-full blur-xl -mr-10 -mt-10"></div>
         <div className="relative z-10">
           <h3 className="text-lg font-bold mb-2">Need Help With Your Newsletter?</h3>
           <p className="text-neutral-300 text-sm mb-4">
             Our team of experts can help you create, optimize, and grow your newsletter.
           </p>
-          <Button className="bg-gold-500 text-dark-900 hover:bg-gold-400">Book a Consultation</Button>
+          <Button className="bg-red-600 text-white hover:bg-black">Book a Consultation</Button>
         </div>
       </motion.div>
 

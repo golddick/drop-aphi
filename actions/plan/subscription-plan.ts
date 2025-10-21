@@ -211,6 +211,7 @@ export async function getCurrentSubscription() {
 }
 
 // Get current usage statistics
+
 export async function getUsageStats() {
   try {
     const user = await getServerAuth();
@@ -218,10 +219,30 @@ export async function getUsageStats() {
       return { error: "You must be logged in to view usage" };
     }
   
-    const currentMonth = new Date().toISOString().slice(0, 7);
+    const currentMonth = new Date().toISOString().slice(0, 7); // "2024-01"
 
-    const usage = await database.membershipUsage.findFirst({
-      where: { userId: user.id, month: currentMonth },
+    // First, let's see ALL usage records for this user to understand the data
+    const allUsage = await database.membershipUsage.findMany({
+      where: { 
+        userId: user.userId
+      },
+      select: {
+        id: true,
+        month: true, // Include month to see what's stored
+        emailsSent: true,
+        subscribersAdded: true,
+        blogPostsCreated: true,
+        aiGenerationsUsed: true,
+        createdAt: true,
+      },
+    });
+
+    // Now try to find the current month's usage
+    const currentUsage = await database.membershipUsage.findFirst({
+      where: { 
+        userId: user.userId, 
+        month: currentMonth 
+      },
       select: {
         emailsSent: true,
         subscribersAdded: true,
@@ -230,8 +251,25 @@ export async function getUsageStats() {
       },
     });
 
-    // Return default values if no usage found
-    return usage || {
+    // If we found current month usage, return it
+    if (currentUsage) {
+      return currentUsage;
+    }
+
+    // If no current month usage found, check if we have any records at all
+    if (allUsage.length > 0) {
+      // Return the most recent record (assuming you want latest data)
+      const mostRecent = allUsage[allUsage.length - 1];
+      return {
+        emailsSent: mostRecent.emailsSent,
+        subscribersAdded: mostRecent.subscribersAdded,
+        blogPostsCreated: mostRecent.blogPostsCreated,
+        aiGenerationsUsed: mostRecent.aiGenerationsUsed,
+      };
+    }
+
+    // No records found at all, return defaults
+    return {
       emailsSent: 0,
       subscribersAdded: 0,
       blogPostsCreated: 0,
@@ -243,7 +281,6 @@ export async function getUsageStats() {
   }
 }
 
-// Downgrade to Free plan
 export async function downgradeToFreePlan() {
   try {
     const user = await getServerAuth();

@@ -39,14 +39,14 @@ export interface BlogComment {
   status: CommentStatus;
   createdAt: Date | string;
   updatedAt: Date | string;
-  member: BlogMember;
+  user: BlogMember;
   replies?: BlogComment[]; 
   parentId: string | null;
 }
 
 export type FormattedComment = {
   id: string;
-  author: string;
+  author: BlogMember;
   authorAvatar: string;
   date: string;
   content: string;
@@ -137,7 +137,7 @@ export interface BlogPost {
   tags: BlogTag[];
   comments: BlogComment[];
   flaggedPosts: BlogPostFlag[]
-  member?: BlogMember | null;
+  user?: BlogMember | null;
   generatedById?: string | null;
 }
 
@@ -175,12 +175,41 @@ export interface RelatedPostsResponse {
 }
 
 export interface BlogPostReaderProps {
-//   slug: string;
+//   slug: string; 
   post: BlogPost;
   relatedPosts: RelatedPost[];
 }
 
 
+// types/blog.ts
+export interface FeaturedPost {
+  id: string
+  title: string
+  slug: string
+  excerpt?: string | null
+  content?: string
+  featuredImage: string | null
+  featuredVideo?: string | null
+  author?: string | null
+  publishedAt: Date
+  readTime?: number | null
+  category?: { name: string } | null
+  tags?: { name: string }[]
+  // Add engagement metrics
+  comments?: Array<any>
+  likes?: number
+  // Add other properties you need
+  createdAt?: Date
+  format?: string
+  isFeatured?: boolean
+  isPinned?: boolean
+}
+
+export interface GetFeaturedPostsResponse {
+  success: boolean
+  data?: FeaturedPost[]
+  error?: string
+}
 
 
 

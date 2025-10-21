@@ -1,455 +1,435 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client"
 
-import type React from "react"
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import {
-  Heart,
-  MessageSquare,
-  Reply,
-  Send,
-  MoreHorizontal,
-  Flag,
-  Edit,
-  Trash2,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { formatString } from "@/lib/utils"
-import { useRouter } from "next/navigation"
+import { Heart, Reply, MessageCircle, Edit, Trash2, Flag, ChevronDown, ChevronUp } from "lucide-react"
+import { useAuthUser } from "@/lib/auth/getClientAuth"
 import { toast } from "sonner"
+import { BlogComment, FormattedComment } from "@/type"
+import { nestComments } from "@/actions/blog/nestComments"
 
-interface Comment {
-  id: string
-  author: string
-  authorAvatar: string
-  date: string
-  content: string
-  likes: number
-  isLiked: boolean
-  replies: Comment[]
-  isAuthor?: boolean
-  isVerified?: boolean
-}
-
-interface CommentSectionProps {
-  comments: Comment[]
+interface CommentsSectionProps {
+  comments: BlogComment[]
   onAddComment: (content: string, parentId?: string) => void
   onLikeComment: (commentId: string) => void
-  onEditComment?: (commentId: string, content: string) => void
-  onDeleteComment?: (commentId: string) => void
-  onReportComment?: (commentId: string) => void
+  onEditComment: (commentId: string, content: string) => void
+  onDeleteComment: (commentId: string) => void
+  onReportComment: (commentId: string) => void
+  currentAuthorId?: string
 }
 
-interface CommentItemProps {
-  comment: Comment
+function CommentItem({ 
+  comment, 
+  onReply, 
+  onLike, 
+  onEdit, 
+  onDelete, 
+  onReport,
+  replyingTo,
+  onSubmitReply,
+  editingComment,
+  onSubmitEdit,
+  depth = 0,
+  isReply = false
+}: {
+  comment: FormattedComment
+  onReply: (commentId: string) => void
   onLike: (commentId: string) => void
-  onReply: (content: string, parentId: string) => void
-  onEdit?: (commentId: string, content: string) => void
-  onDelete?: (commentId: string) => void
-  onReport?: (commentId: string) => void
+  onEdit: (commentId: string) => void
+  onDelete: (commentId: string) => void
+  onReport: (commentId: string) => void
+  replyingTo: string | null
+  onSubmitReply: (commentId: string, content: string) => void
+  editingComment: string | null
+  onSubmitEdit: (commentId: string, content: string) => void
   depth?: number
   isReply?: boolean
-}
+}) {
+  const [isLiked, setIsLiked] = useState(comment.isLiked)
+  const [replyContent, setReplyContent] = useState("")
+  const [editContent, setEditContent] = useState(comment.content)
+  const [showReplies, setShowReplies] = useState(depth === 0)
+  const [showAllReplies, setShowAllReplies] = useState(false)
+  const [showReplyForm, setShowReplyForm] = useState(false) // New state to control reply form visibility
+  const { user } = useAuthUser()
 
-const MAX_DEPTH = 2 // Replies deeper than this will collapse into "View Thread"
+  const isOwner = user?.userId === comment.author.userId
+  const formattedDate = comment.date
 
-const CommentItem: React.FC<CommentItemProps> = ({
-  comment,
-  onLike,
-  onReply,
-  onEdit,
-  onDelete,
-  onReport,
-  depth = 0,
-  isReply = false,
-}) => {
-  const [showReplyForm, setShowReplyForm] = useState(false)
-  const [replyText, setReplyText] = useState("")
-  const [showReplies, setShowReplies] = useState(false)
-  const [showDeepThread, setShowDeepThread] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editText, setEditText] = useState(comment.content)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const replies = comment.replies || []
+  const replyCount = replies.length
 
-  const handleReplySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    if (!replyText.trim()) return
+  const displayedReplies = showAllReplies 
+    ? replies 
+    : replies.slice(0, 5)
 
-    onReply(replyText, comment.id)
-    setReplyText("")
+  const hasMoreReplies = replyCount > 5
+
+  const handleLike = () => {
+    setIsLiked(!isLiked)
+    onLike(comment.id)
+  }
+
+  const handleReplyClick = () => {
+    setShowReplyForm(true)
+    onReply(comment.id)
+  }
+
+  const handleSubmitReply = () => {
+    if (replyContent.trim()) {
+      onSubmitReply(comment.id, replyContent)
+      setReplyContent("")
+      setShowReplyForm(false) // Hide form after submitting
+      // Auto-show replies when a new reply is added
+      if (!showReplies) {
+        setShowReplies(true)
+      }
+    }
+  }
+
+  const handleCancelReply = () => {
     setShowReplyForm(false)
-    setIsLoading(false)
-    toast.success("Reply added successfully")
-    router.refresh()
+    setReplyContent("")
+    onReply('')
   }
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    if (!editText.trim() || !onEdit) return
-
-    onEdit(comment.id, editText)
-    setIsEditing(false)
-    setIsLoading(false)
-    toast.success("Comment edited successfully")
-    router.refresh()
+  const handleSubmitEdit = () => {
+    if (editContent.trim() && editContent !== comment.content) {
+      onSubmitEdit(comment.id, editContent)
+    }
   }
 
-  const handleCancelEdit = () => {
-    setEditText(comment.content)
-    setIsEditing(false)
+  const handleDelete = () => {
+    if (confirm("Are you sure you want to delete this comment?")) {
+      onDelete(comment.id)
+    }
   }
 
-  const shouldCollapse = depth >= MAX_DEPTH
+  const handleReport = () => {
+    if (confirm("Report this comment for review?")) {
+      onReport(comment.id)
+    }
+  }
+
+  const toggleReplies = () => {
+    setShowReplies(!showReplies)
+  }
+
+  const toggleShowAllReplies = () => {
+    setShowAllReplies(!showAllReplies)
+  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className={`${isReply ? "ml-8 border-l-2 border-blue-100 pl-6" : ""}`}
-    >
-      <div className="bg-white rounded-xl border-none border-neutral-200 p-2 md:p-4 hover:shadow-md transition-all duration-200">
-        <div className="flex flex-col items-start">
-          <div className="flex items-start gap-4">
-            <Avatar className="h-6 w-6 lg:h-10 lg:w-10 ring-2 ring-gold-100">
-              <AvatarImage src={comment.authorAvatar} alt={comment.author} />
-              <AvatarFallback className="bg-gradient-to-br from-black to-gold-100 text-white font-semibold">
-                {comment.author
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <h4 className="font-semibold text-neutral-900 truncate">{formatString(comment.author)}</h4>
-                {comment.isVerified && (
-                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
-                    Verified
-                  </Badge>
-                )}
-                {comment.isAuthor && (
-                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                    Author
-                  </Badge>
-                )}
-                <span className="text-sm text-neutral-500">{comment.date}</span>
-              </div>
-
-              {isEditing ? (
-                <form onSubmit={handleEditSubmit} className="mb-4">
-                  <Textarea
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className="mb-3 min-h-[80px] resize-none"
-                    placeholder="Edit your comment..."
-                  />
-                  <div className="flex gap-2">
-                    <Button type="submit" size="sm" disabled={!editText.trim()}>
-                      {isLoading ? "Saving..." : <Send className="h-4 w-4 mr-1" />}
-                    </Button>
-                    <Button type="button" variant="outline" size="sm" onClick={handleCancelEdit}>
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              ) : (
-                <p className="text-neutral-700 leading-relaxed mb-4 whitespace-pre-wrap">{comment.content}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onLike(comment.id)}
-                className={`${
-                  comment.isLiked ? "text-red-500 bg-red-50" : "text-neutral-500 hover:text-red-500"
-                } transition-colors`}
-              >
-                <Heart className={`h-4 w-4 mr-1 ${comment.isLiked ? "fill-current" : ""}`} />
-                {comment.likes}
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowReplyForm(!showReplyForm)}
-                className="text-neutral-500 hover:text-blue-500 transition-colors"
-              >
-                <Reply className="h-4 w-4 mr-1" />
-                Reply
-              </Button>
-
-              {comment.replies.length > 0 && !shouldCollapse && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowReplies(!showReplies)}
-                  className="text-neutral-500 hover:text-blue-500 transition-colors"
-                >
-                  {showReplies ? <ChevronUp className="h-4 w-4 mr-1" /> : <ChevronDown className="h-4 w-4 mr-1" />}
-                  {comment.replies.length} {comment.replies.length === 1 ? "reply" : "replies"}
-                </Button>
-              )}
-
-              {comment.replies.length > 0 && shouldCollapse && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowDeepThread(!showDeepThread)}
-                  className="text-neutral-500 hover:text-blue-500 transition-colors"
-                >
-                  {showDeepThread ? (
-                    <>
-                      <ChevronUp className="h-4 w-4 mr-1" /> Hide Thread
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-4 w-4 mr-1" /> View Thread ({comment.replies.length})
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-neutral-600">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {comment.isAuthor && onEdit && (
-                  <DropdownMenuItem onClick={() => setIsEditing(true)} className="text-blue-600">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Comment
-                  </DropdownMenuItem>
-                )}
-                {comment.isAuthor && onDelete && (
-                  <DropdownMenuItem onClick={() => onDelete(comment.id)} className="text-red-600">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Comment
-                  </DropdownMenuItem>
-                )}
-                {!comment.isAuthor && onReport && (
-                  <DropdownMenuItem onClick={() => onReport(comment.id)} className="text-orange-600">
-                    <Flag className="h-4 w-4 mr-2" />
-                    Report Comment
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {/* Reply Form */}
-        <AnimatePresence>
-          {showReplyForm && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="mt-4 ml-16"
-            >
-              <form onSubmit={handleReplySubmit} className="space-y-3">
-                <Textarea
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={`Reply to ${formatString(comment.author)}...`}
-                  className="min-h-[80px] resize-none"
-                />
-                <div className="flex gap-2">
-                  <Button type="submit" size="sm" disabled={!replyText.trim()}>
-                    <Send className="h-4 w-4 mr-1" />
-                    {isLoading ? "Replying..." : "Post Reply"}
-                  </Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setShowReplyForm(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </motion.div>
+    <div className={`${isReply ? 'ml-8 border-l-2 border-gray-200 pl-6' : ''} ${depth > 0 ? 'mt-4' : ''}`}>
+      <div className="flex gap-4 mb-4">
+        <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+          {comment.authorAvatar ? (
+            <img 
+              src={comment.authorAvatar} 
+              alt={comment.author.userName}
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
+            comment.author.userName.charAt(0).toUpperCase()
           )}
-        </AnimatePresence>
+        </div>
+        
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <p className="font-semibold text-black">{comment.author.userName}</p>
+            {comment.isAuthor && (
+              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Author</span>
+            )}
+            <p className="text-sm text-gray-500">{formattedDate}</p>
+          </div>
+
+          {editingComment === comment.id ? (
+            <div className="mb-3">
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-600 focus:outline-none resize-none"
+                rows={3}
+              />
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={handleSubmitEdit}
+                  className="px-3 py-1 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => onEdit('')}
+                  className="px-3 py-1 bg-gray-200 text-black rounded-lg hover:bg-gray-300 text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-700 mb-3">{comment.content}</p>
+          )}
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-1 text-sm transition-all ${
+                isLiked ? "text-red-600" : "text-gray-500 hover:text-red-600"
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+              <span>{comment.likes + (isLiked ? 1 : 0)}</span>
+            </button>
+            
+            <button
+              onClick={handleReplyClick}
+              className="flex items-center gap-1 text-sm text-gray-500 hover:text-yellow-600 transition-all"
+            >
+              <Reply className="w-4 h-4" />
+              Reply
+            </button>
+
+            {/* Show replies toggle for comments with replies */}
+            {replyCount > 0 && (
+              <button
+                onClick={toggleReplies}
+                className="flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-all"
+              >
+                {showReplies ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
+              </button>
+            )}
+
+            {isOwner && (
+              <>
+                <button
+                  onClick={() => onEdit(comment.id)}
+                  className="flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-all"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-1 text-sm text-gray-500 hover:text-red-600 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </button>
+              </>
+            )}
+
+            {!isOwner && (
+              <button
+                onClick={handleReport}
+                className="flex items-center gap-1 text-sm text-gray-500 hover:text-orange-600 transition-all"
+              >
+                <Flag className="w-4 h-4" />
+                Report
+              </button>
+            )}
+          </div>
+
+          {/* Reply Form - Only shown when showReplyForm is true */}
+          {showReplyForm && replyingTo === comment.id && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <textarea
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                placeholder="Write a reply..."
+                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-600 focus:outline-none resize-none"
+                rows={3}
+              />
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={handleSubmitReply}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-semibold"
+                >
+                  Post Reply
+                </button>
+                <button
+                  onClick={handleCancelReply}
+                  className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Replies */}
-      <AnimatePresence>
-        {!shouldCollapse && showReplies && comment.replies.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mt-4 space-y-4"
-          >
-            {comment.replies.map((reply) => (
-              <CommentItem
-                key={reply.id}
-                comment={reply}
-                onLike={onLike}
-                onReply={onReply}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onReport={onReport}
-                depth={depth + 1}
-                isReply={true}
-              />
-            ))}
-          </motion.div>
-        )}
-
-        {shouldCollapse && showDeepThread && comment.replies.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mt-4 space-y-4"
-          >
-            {comment.replies.map((reply) => (
-              <CommentItem
-                key={reply.id}
-                comment={reply}
-                onLike={onLike}
-                onReply={onReply}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onReport={onReport}
-                depth={depth + 1}
-                isReply={true}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {/* Nested Replies - Show immediately for top-level comments */}
+      {replyCount > 0 && showReplies && (
+        <div className="space-y-4 mt-4">
+          {displayedReplies.map((reply) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              onReply={onReply}
+              onLike={onLike}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onReport={onReport}
+              replyingTo={replyingTo}
+              onSubmitReply={onSubmitReply}
+              editingComment={editingComment}
+              onSubmitEdit={onSubmitEdit}
+              depth={depth + 1}
+              isReply={true}
+            />
+          ))}
+          
+          {/* View More Replies Button */}
+          {hasMoreReplies && (
+            <div className="ml-12">
+              <button
+                onClick={toggleShowAllReplies}
+                className="flex items-center gap-1 text-sm text-yellow-600 hover:text-yellow-700 font-medium"
+              >
+                {showAllReplies ? (
+                  <>
+                    <ChevronUp className="w-4 h-4" />
+                    Show fewer replies
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4" />
+                    View {replyCount - 5} more replies
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
-export const CommentSection: React.FC<CommentSectionProps> = ({
+export default function CommentsSection({
   comments,
   onAddComment,
   onLikeComment,
   onEditComment,
   onDeleteComment,
   onReportComment,
-}) => {
-  const [newCommentText, setNewCommentText] = useState("")
-  const [sortBy] = useState<"newest" | "oldest" | "popular">("newest")
-  const [isLoading] = useState(false)
+  currentAuthorId
+}: CommentsSectionProps) {
+  const [newComment, setNewComment] = useState("")
+  const [replyingTo, setReplyingTo] = useState<string | null>(null)
+  const [editingComment, setEditingComment] = useState<string | null>(null)
+  const { user } = useAuthUser()
 
-  const handleNewCommentSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newCommentText.trim()) return
+  // Use the nestComments function to format comments
+  const nestedComments = nestComments(comments, currentAuthorId)
 
-    onAddComment(newCommentText)
-    setNewCommentText("")
+  const handleSubmitComment = () => {
+    if (!user) {
+      toast.error("Please log in to comment")
+      return
+    }
+
+    if (newComment.trim()) {
+      onAddComment(newComment)
+      setNewComment("")
+      toast.success("Comment added successfully")
+    }
   }
 
-  const sortedComments = [...comments].sort((a, b) => {
-    switch (sortBy) {
-      case "popular":
-        return b.likes - a.likes
-      case "oldest":
-        return new Date(a.date).getTime() - new Date(b.date).getTime()
-      case "newest":
-      default:
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
+  const handleSubmitReply = (commentId: string, content: string) => {
+    if (!user) {
+      toast.error("Please log in to reply")
+      return
     }
-  })
 
-  const totalComments = comments.length
+    onAddComment(content, commentId)
+    setReplyingTo(null)
+    toast.success("Reply added successfully")
+  }
+
+  const handleSubmitEdit = (commentId: string, content: string) => {
+    onEditComment(commentId, content)
+    setEditingComment(null)
+    toast.success("Comment updated successfully")
+  }
+
+  // Calculate total comments including replies
+  const calculateTotalComments = (comments: FormattedComment[]): number => {
+    return comments.reduce((total, comment) => {
+      const repliesCount = comment.replies ? comment.replies.length : 0
+      return total + 1 + repliesCount
+    }, 0)
+  }
+
+  const totalComments = calculateTotalComments(nestedComments)
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 border border-neutral-200">
-      <div className="flex items-start justify-start">
-        <div className="flex items-center gap-3">
-          <MessageSquare className="h-6 w-6 text-blue-500" />
-          <h3 className=" text-[15px] lg:text-2xl font-bold text-neutral-900">Comments ({totalComments})</h3>
-        </div>
+    <section className="mt-16 pt-12 border-t-2 border-gray-200">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-black mb-2 flex items-center gap-2">
+          <MessageCircle className="w-8 h-8" />
+          Comments ({totalComments})
+        </h2>
+        <p className="text-gray-600">Join the discussion and share your thoughts</p>
       </div>
 
       {/* New Comment Form */}
-      <div className="mb-8 p-2 bg-white rounded-xl border-none">
-        <h4 className="text-lg font-semibold text-neutral-900 mb-4">Join the Discussion</h4>
-        <form onSubmit={handleNewCommentSubmit} className="space-y-4">
-          <Textarea
-            value={newCommentText}
-            onChange={(e) => setNewCommentText(e.target.value)}
-            placeholder="Share your thoughts on this article..."
-            className="min-h-[100px] bg-white"
+      {user && (
+        <div className="mb-12 p-6 bg-gray-50 rounded-lg border-2 border-gray-200">
+          <h3 className="font-semibold text-black mb-4">Leave a comment</h3>
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Share your thoughts..."
+            className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-yellow-600 focus:outline-none resize-none mb-4"
+            rows={4}
           />
-          <div className="flex justify-between items-center">
-            <Button type="submit" disabled={!newCommentText.trim()} className="bg-black text-white hover:bg-gold-700">
-              <Send className="h-4 w-4 mr-2" />
-              {isLoading ? "Submitting..." : "Submit Comment"}
-            </Button>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">{newComment.length} characters</p>
+            <button
+              onClick={handleSubmitComment}
+              disabled={!newComment.trim()}
+              className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Post Comment
+            </button>
           </div>
-        </form>
-      </div>
-
-      {/* Comments List */}
-      <div className="space-y-4">
-        <AnimatePresence>
-          {sortedComments.length > 0 && (
-            sortedComments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                onLike={onLikeComment}
-                onReply={(content, parentId) => onAddComment(content, parentId)}
-                onEdit={onEditComment}
-                onDelete={onDeleteComment}
-                onReport={onReportComment}
-              />
-            ))
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Load More Comments (if needed) */}
-      {comments.length > 10 && (
-        <div className="text-center mt-8">
-          <Button variant="outline" className="bg-white">
-            Load More Comments
-          </Button>
         </div>
       )}
-    </div>
+
+      {!user && (
+        <div className="mb-12 p-6 bg-yellow-50 rounded-lg border-2 border-yellow-200 text-center">
+          <p className="text-yellow-800">
+            Please <button className="text-yellow-600 font-semibold underline">log in</button> to join the discussion.
+          </p>
+        </div>
+      )}
+
+      {/* Comments List */}
+      <div className="space-y-8">
+        {nestedComments.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <MessageCircle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <p>No comments yet. Be the first to share your thoughts!</p>
+          </div>
+        ) : (
+          nestedComments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              onReply={setReplyingTo}
+              onLike={onLikeComment}
+              onEdit={setEditingComment}
+              onDelete={onDeleteComment}
+              onReport={onReportComment}
+              replyingTo={replyingTo}
+              onSubmitReply={handleSubmitReply}
+              editingComment={editingComment}
+              onSubmitEdit={handleSubmitEdit}
+            />
+          ))
+        )}
+      </div>
+    </section>
   )
 }

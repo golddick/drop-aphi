@@ -1,124 +1,108 @@
-
-
 "use client"
 
-import { motion } from "framer-motion"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useEffect, useRef, useState } from "react"
+import { ChevronDown } from "lucide-react"
 
-export function FAQ() {
+interface FAQItemProps {
+  question: string
+  answer: string
+  delay: number
+}
+
+function FAQItem({ question, answer, delay }: FAQItemProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className={`border-2 border-gray-200 rounded-lg overflow-hidden transition-all duration-300 ${
+        isOpen ? "border-yellow-600 bg-yellow-50" : "bg-white"
+      } ${isVisible ? "animate-slide-in-up" : "opacity-0"}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      >
+        <h3 className="text-lg font-semibold text-black text-left">{question}</h3>
+        <ChevronDown
+          className={`w-5 h-5 text-yellow-600 transition-transform duration-300 flex-shrink-0 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {isOpen && (
+        <div className="px-6 pb-6 border-t-2 border-gray-200">
+          <p className="text-gray-600 leading-relaxed">{answer}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function FAQ() {
   const faqs = [
     {
-      question: "Do I need to set up SMTP servers?",
+      question: "What is DropAphi?",
       answer:
-        "No! That's the beauty of Xypher. We handle all the email infrastructure, SMTP configuration, IP reputation management, and deliverability optimization. You just make API calls and we handle the rest.",
+        "DropAphi is a unified communication platform designed for both developers and content creators. It provides powerful APIs for newsletters, OTP authentication, and blog content management, along with an intuitive UI for non-technical users.",
     },
     {
-      question: "How reliable is the email delivery?",
+      question: "How do I get started with the APIs?",
       answer:
-        "We guarantee 99.9% uptime with our global infrastructure. Our emails are delivered through multiple redundant pathways with real-time monitoring and automatic failover to ensure maximum deliverability.",
+        "Getting started is simple! Sign up for a free account, generate your API keys from the dashboard, and refer to our comprehensive documentation. We provide SDKs for popular languages and code examples for quick integration.",
     },
     {
-      question: "Can I customize the email templates?",
+      question: "What are the pricing plans?",
       answer:
-        "You can use our drag-and-drop builder, create custom HTML templates, or use our template API to dynamically generate emails. All templates are mobile-responsive and tested across major email clients.",
+        "We offer flexible pricing based on your usage. Start with our free tier for up to 1,000 emails per month, then upgrade to Pro or Enterprise plans as you scale. All plans include access to our full API suite.",
     },
     {
-      question: "How secure is the OTP verification?",
+      question: "Is my data secure?",
       answer:
-        "Our OTP system uses industry-standard security practices including rate limiting, encryption in transit and at rest, and configurable expiry times. We're SOC 2 compliant and follow GDPR guidelines.",
+        "Yes, security is our top priority. We're SOC 2 compliant, use end-to-end encryption, and follow GDPR regulations. All data is encrypted in transit and at rest, with regular security audits.",
     },
     {
-      question: "What's included in the free tier?",
+      question: "Do you offer customer support?",
       answer:
-        "The free tier includes 10,000 emails per month, 1,000 OTP verifications, basic blog templates, email support, and access to all core APIs. Perfect for getting started and small projects.",
+        "We provide 24/7 email support for all users, with priority support for Pro and Enterprise customers. We also have an active community forum and comprehensive documentation.",
     },
     {
-      question: "How does the Blog Content API work?",
+      question: "Can I integrate DropAphi with my existing tools?",
       answer:
-        "Our Blog API acts as a headless CMS. You create content through our dashboard, choose from our templates, and fetch the content via API to display on any website or application with your preferred styling.",
-    },
-    {
-      question: "Can I track email analytics?",
-      answer:
-        "Yes! We provide comprehensive analytics including open rates, click-through rates, bounce rates, and delivery statistics. All data is available in real-time through our dashboard and analytics API.",
-    },
-    {
-      question: "What kind of support do you offer?",
-      answer:
-        "We offer email support for all plans, priority support for Professional plans, and 24/7 phone support for Enterprise customers. We also have comprehensive documentation and code examples.",
-    },
-    {
-      question: "How do I get started?",
-      answer:
-        "Simply sign up for a free account, get your API key, and start making API calls. We have SDKs for popular programming languages and comprehensive documentation to get you up and running in minutes.",
-    },
-    {
-      question: "Can I use Xypher for transactional emails?",
-      answer:
-        "Yes! Xypher is perfect for transactional emails like welcome messages, password resets, order confirmations, and notifications. Our high deliverability rates ensure your important emails reach users' inboxes.",
+        "Yes! DropAphi integrates with popular platforms like Zapier, Make, and many others. We also provide webhooks and REST APIs for custom integrations with any system.",
     },
   ]
 
   return (
-    <section className="py-20 bg-neutral-900">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            <span className="text-white">Frequently Asked</span>{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-400 to-red-400">Questions</span>
-          </h2>
-          <p className="text-xl text-neutral-300 max-w-3xl mx-auto">
-            Everything you need to know about Xypher's email infrastructure
-          </p>
-        </motion.div>
+    <section id="faq" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">Frequently Asked Questions</h2>
+          <p className="text-xl text-gray-600">Find answers to common questions about DropAphi</p>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto"
-        >
-          <Accordion type="single" collapsible className="space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem
-                key={index}
-                value={`item-${index}`}
-                className="bg-black border border-neutral-800 rounded-lg px-6 hover:border-gold-500/30 transition-colors"
-              >
-                <AccordionTrigger className="text-left text-white hover:text-gold-400 transition-colors">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-neutral-300 leading-relaxed">{faq.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <p className="text-neutral-400 mb-4">Still have questions? We're here to help.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="mailto:support@xypher.com" className="text-gold-400 hover:text-gold-300 transition-colors">
-              support@xypher.com
-            </a>
-            <span className="hidden sm:block text-neutral-600">|</span>
-            <a href="/docs" className="text-gold-400 hover:text-gold-300 transition-colors">
-              View Documentation
-            </a>
-          </div>
-        </motion.div>
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => (
+            <FAQItem key={idx} question={faq.question} answer={faq.answer} delay={idx * 50} />
+          ))}
+        </div>
       </div>
     </section>
   )
