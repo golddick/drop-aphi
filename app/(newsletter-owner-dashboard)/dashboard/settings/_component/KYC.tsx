@@ -292,7 +292,7 @@ export default function KYCPage() {
   }
 
   const submitLevel2 = async () => {
-    if (!user?.id || !accountType) return
+    if (!user?.userId || !accountType) return
 
     try {
       setIsUploading("level-2")
@@ -509,7 +509,7 @@ export default function KYCPage() {
   }
 
   const submitLevel3 = async () => {
-    if (!user?.id) return
+    if (!user?.userId) return
     
     try {
       setIsUploading("level-3")
@@ -724,7 +724,8 @@ export default function KYCPage() {
     return <Loader />
   }
 
-    console.log(kycStatus, 'kyc status')
+  
+    
 
 
   if (hasCompletedKYC && currentLevel >= 4 && !isEditMode) {

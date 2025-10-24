@@ -134,3 +134,17 @@ export type NewsletterStats = {
   avgSubscribersPerNewsletter: number;
   topPerformingNewsletters: TopNewsletter[];
 };
+
+
+export type NewsletterConfig = {
+  title: string
+  description: string
+  type: NewsletterSettingType
+  primaryColor: string
+  accentColor: string
+  ctaText: string
+  successMessage: string
+  logo: string | null
+  backgroundImage: string | null
+  galleryImages: string[]
+}

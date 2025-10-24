@@ -87,21 +87,18 @@ export async function fetchKycById(kycId: string) {
 
 
 
-
-
 export async function updateKycStatus(
   kycId: string,
-  status: "APPROVED" | "REJECTED",
+  status: "APPROVED" | "REJECTED", 
   comments?: string
 ) {
-   const user = await getServerAuth();
+  const user = await getServerAuth();
   if (!user) return { success: false, error: "You must be logged in" };
 
   const userId = user.userId;
 
   try {
-
-     // Get KYC application with user details
+    // Get KYC application with user details
     const kycApplication = await database.kyc.findUnique({
       where: { id: kycId },
       select: {
@@ -113,25 +110,21 @@ export async function updateKycStatus(
         rejectedResponse: true,
         user: {
           select: {
+            id: true, // Added to update user record
+            userId: true,
             email: true,
             fullName: true,
             imageUrl: true,
           }
-          
         }
-        
-
       }
-       
-
-    })
+    });
 
     if (!kycApplication) {
-      return { success: false, error: "KYC application not found" }
+      return { success: false, error: "KYC application not found" };
     }
 
-
-
+    // Update KYC status
     const updated = await database.kyc.update({
       where: { id: kycId },
       data: {
@@ -142,18 +135,38 @@ export async function updateKycStatus(
       },
     });
 
-        // Send notification for both APPROVED and REJECTED statuses
+    // Update user's approvedKYC field when status is APPROVED
+    if (status === "APPROVED") {
+      await database.user.update({
+        where: { id: kycApplication.user.id },
+        data: {
+          approvedKYC: true,
+          kycStatus: "APPROVED", // Also update the kycStatus field
+        },
+      });
+    } else if (status === "REJECTED") {
+      // Optionally reset approvedKYC when rejected
+      await database.user.update({
+        where: { id: kycApplication.user.id },
+        data: {
+          approvedKYC: false,
+          kycStatus: "REJECTED", // Update kycStatus field
+        },
+      });
+    }
+
+    // Send notification for both APPROVED and REJECTED statuses
     const notificationResult = await notifyUserAboutKycStatus({
       kycApplication: {
         ...updated,
         user: kycApplication.user
       },
       adminEmail: user.email || '',
-      fromApplication: user.SenderName || 'Drop-Aphi',
-    })
+      fromApplication:  'Drop-Aphi', 
+    });
 
     if (!notificationResult.success) {
-      console.warn('KYC notification failed:', notificationResult.error)
+      console.warn('KYC notification failed:', notificationResult.error);
       // Continue even if notification fails
     }
  
@@ -163,3 +176,7 @@ export async function updateKycStatus(
     return { success: false, error: "Failed to update KYC status" };
   }
 }
+
+
+
+

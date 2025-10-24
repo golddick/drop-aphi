@@ -73,7 +73,7 @@ export async function submitKYCLevel2(formData: FormData, accountType: KYCAccoun
   const user = await getServerAuth();
   if (!user) return { success: false, error: "You must be logged in" };
 
-  const kyc = await database.kyc.findUnique({ where: { userId: user.id } });
+  const kyc = await database.kyc.findUnique({ where: { userId: user.userId } });
   if (!kyc) return { success: false, error: "KYC not started" };
 
   const levels = kyc.levels as any;
@@ -137,7 +137,7 @@ export async function submitKYCLevel2(formData: FormData, accountType: KYCAccoun
 
   // Create documents
   await database.kyc.update({
-    where: { userId: user.id },
+    where: { userId: user.userId },
     data: {
       accountType,
       levels: updatedLevels,
@@ -146,7 +146,7 @@ export async function submitKYCLevel2(formData: FormData, accountType: KYCAccoun
   });
 
   await database.user.update({
-    where: { userId: user.id },
+    where: { userId: user.userId },
     data: {
       kycStatus: KYCStatus.IN_PROGRESS,
       organization: accountType === KYCAccountType.INDIVIDUAL ? "" : `${level2Data.legalName || ""}`,
@@ -167,7 +167,7 @@ export async function submitKYCLevel3(
   const user = await getServerAuth();
   if (!user) return { success: false, error: "You must be logged in" };
 
-  const kyc = await database.kyc.findUnique({ where: { userId: user.id } });
+  const kyc = await database.kyc.findUnique({ where: { userId: user.userId } });
   if (!kyc) return { success: false, error: "KYC not started" };
 
   const levels = kyc.levels as any;
@@ -193,7 +193,7 @@ export async function submitKYCLevel3(
   });
 
   await database.kyc.update({
-    where: { userId: user.id },
+    where: { userId: user.userId },
     data: {
       levels: updatedLevels,
       livePhoto,
@@ -209,7 +209,7 @@ export async function submitKYCLevel3(
   });
 
    await database.user.update({
-    where: { userId: user.id },
+    where: { userId: user.userId },
     data: {
       kycStatus: KYCStatus.COMPLETED,
     },
@@ -222,7 +222,7 @@ export async function submitKYCLevel3(
 export async function updateKYCInformation(
   userId: string,
   accountType: KYCAccountType,
-  formData: FormData
+  formData: FormData 
 ) {
   if (!userId) {
     return { success: false, error: "You must be logged in" };
@@ -264,7 +264,7 @@ export async function getKYCStatus() {
   if (!user) return { success: false, error: "Unauthorized" };
 
   const kyc = await database.kyc.findUnique({
-    where: { userId: user.id },
+    where: { userId: user.userId },
     include: { kycDocuments: true },
   });
 

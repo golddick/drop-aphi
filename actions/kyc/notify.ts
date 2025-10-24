@@ -250,14 +250,14 @@ function personalizeKycContent(
       .replace(/\[User Name\]/g, userName)
       .replace(/\[KYC ID\]/g, kycApplication.id)
       .replace(/\[Status\]/g, kycApplication.status)
-      .replace(/\[Reviewer Name\]/g, kycApplication.reviewedBy || 'DROPAPHI TEAM')
+      .replace(/\[Reviewer Name\]/g,  'DROPAPHI TEAM')
       .replace(/\[Review Date\]/g, reviewDate)
       .replace(/\[Platform\]/g, fromApplication),
     text: (template.text || '')
       .replace(/\[User Name\]/g, userName)
       .replace(/\[KYC ID\]/g, kycApplication.id)
       .replace(/\[Status\]/g, kycApplication.status)
-      .replace(/\[Reviewer Name\]/g, kycApplication.reviewedBy || 'DROPAPHI TEAM')
+      .replace(/\[Reviewer Name\]/g,  'DROPAPHI TEAM')
       .replace(/\[Review Date\]/g, reviewDate)
       .replace(/\[Platform\]/g, fromApplication),
   };

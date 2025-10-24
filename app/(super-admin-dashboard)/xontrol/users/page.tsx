@@ -1,9 +1,10 @@
 import React from 'react'
+import AdminUsersPage from './_component'
 
 const page = () => {
   return (
     <div>
-      page
+      <AdminUsersPage/>
     </div>
   )
 }

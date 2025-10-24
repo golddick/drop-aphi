@@ -180,6 +180,10 @@ enum BlogTemplate {
 
 }
 
+enum NewsletterSettingType {
+  NEWSLETTER
+  WAITLIST
+}
 
 
 model User {
@@ -228,12 +232,15 @@ model User {
   flagedPosts                  FlagedBlogPost[]
   invoices                     Invoice[]
   kyc                          Kyc?
+  NewsletterSettings           NewsletterSettings?
   usage                        MembershipUsage[]
   notificationEmails           EmailNotification[]
   tokens                       RefreshToken[]
   reportedComments             ReportedComment[]
   template                     EmailTemplate[]
   unsubscribes                 UnsubscribeEvent[]
+  PlatformSubscribers         PlatformSubscriber[]              @relation("PlatformSubscriberToPlatformSubscriber")
+  SystemEmailTemplate         SystemEmailTemplate[]
 
   @@index([paystackCustomerId])
   @@index([paystackSubscriptionId])
@@ -316,6 +323,7 @@ model PlatformSubscriber {
   unsubscribeReason String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  user            User? @relation("PlatformSubscriberToPlatformSubscriber", fields: [userId], references: [userId])
 
   @@map("platform_subscribers")
 }
@@ -680,6 +688,7 @@ model Email {
   // Status & Tracking
   status            EmailStatus   @default(DRAFT)
   emailType         EmailType     @default(NEWSLETTER)
+
   trackOpens        Boolean       @default(true)
   trackClicks       Boolean       @default(true)
   enableUnsubscribe Boolean       @default(true)
@@ -724,6 +733,7 @@ model Email {
   clickedLinks      ClickedLink[]
   emailAttachments  EmailAttachment[]
   emailRecipients   EmailRecipient[]
+  SystemEmailTemplate SystemEmailTemplate[]
   template          EmailTemplate? @relation(fields: [templateUsed], references: [id], onDelete: SetNull)
   emailAnalytics    EmailAnalytics?
   
@@ -760,6 +770,31 @@ model EmailElement {
 
 // Template system for Mail Studio
 model EmailTemplate {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  thumbnail   String?      // URL to template preview image
+  category    String       // Basics, Layout, Media, etc.
+  tags        String[]
+  elements    Json         // Array of EmailElement data
+  subject     String       // Default subject
+  isPublic    Boolean      @default(false)
+  isFeatured  Boolean      @default(false)
+  usageCount  Int          @default(0)
+  userId      String?      // Null for system templates
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  user        User?        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  emails      Email[]      // Emails created from this template
+  
+  @@index([userId])
+  @@index([category])
+  @@index([isPublic])
+  @@index([isFeatured])
+}
+
+model SystemEmailTemplate {
   id          String       @id @default(uuid())
   name        String
   description String?
@@ -844,4 +879,28 @@ model EmailAnalytics {
   @@index([emailId])
 
 
+}
+
+model NewsletterSettings {
+  id              String   @id @default(cuid())
+  creatorId       String   @unique
+  title           String
+  description     String
+  type            NewsletterSettingType   @default(NEWSLETTER) // "newsletter" or "waitlist"
+  primaryColor    String   @default("#DC2626")
+  accentColor     String   @default("#FCD34D")
+  ctaText         String   @default("Subscribe Now")
+  successMessage  String   @default("Thanks for subscribing! Check your email for confirmation.")
+  logo            String?  // Store as URL or base64
+  backgroundImage String?
+  galleryImages   String[] // Store as JSON array of URLs/base64
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  creator         User    @relation(fields: [creatorId], references: [userId])
+
+  @@index([creatorId])
+  @@index([title])
+
+  @@map("newsletter_settings")
 }

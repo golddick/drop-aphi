@@ -127,7 +127,7 @@ export function KycReview({ kycId }: KycReviewProps) {
   const fetchKycData = async () => {
     try {
       setLoading(true)
-      const result = await fetchKycById(kycId)
+      const result = await fetchKycById(kycId) 
 
       console.log(result, "result")
       

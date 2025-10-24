@@ -17,8 +17,8 @@ export default function Footer() {
 
       {/* Main Footer */}
       <div className="px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
+        <div className="max-w-7xl mx-auto ">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 ">
             <div>
               <div className="flex items-center gap-2 mb-4">
                    <Logo />
@@ -28,8 +28,8 @@ export default function Footer() {
               </p>
             </div>
 
-          <div className=" grid grid-cols-3 md:grid-cols-3 gap-4" >
-              <div>
+          <div className=" grid grid-cols-3 md:grid-cols-3  gap-4" >
+              <div className=" w-full">
               <h4 className="font-bold mb-4 text-white">Product</h4>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li>
@@ -81,31 +81,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* <div>
-              <h4 className="font-bold mb-4 text-white">Resources</h4>
-              <ul className="space-y-3 text-gray-400 text-sm">
-                <li>
-                  <Link href="/guides" className="hover:text-yellow-600 transition-colors">
-                    Guides
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/community" className="hover:text-yellow-600 transition-colors">
-                    Community
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/status" className="hover:text-yellow-600 transition-colors">
-                    Status
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/support" className="hover:text-yellow-600 transition-colors">
-                    Support
-                  </Link>
-                </li>
-              </ul>
-            </div> */}
 
             <div >
               <h4 className="font-bold mb-4 text-white">Legal</h4>

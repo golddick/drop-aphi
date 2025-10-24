@@ -128,11 +128,11 @@ export const sideBarBottomItems: DashboardSideBarTypes[] = [
     url: "/dashboard/settings",
     icon: ICONS.settings,
   },
-  // {
-  //   title: "Generated URL",
-  //   url: "/dashboard/url",
-  //   icon: ICONS.world,
-  // },
+  {
+    title: "Generated URL",
+    url: "/dashboard/url",
+    icon: ICONS.world,
+  },
 
 ];
 
@@ -149,6 +149,11 @@ export const AdminsideBarItems: DashboardSideBarTypes[] = [
     icon: ICONS.profile,
   },
   {
+  title: "Mail",
+  url: "/xontrol/mail",
+  icon: ICONS.profile,
+  },
+  {
     title: "KYC",
     url: "/xontrol/kyc",
     icon: ICONS.form,
@@ -157,6 +162,16 @@ export const AdminsideBarItems: DashboardSideBarTypes[] = [
     title: "Blog",
     url: "/xontrol/blog",
     icon: ICONS.blog,
+  },
+  {
+    title: " Subscribers",
+    url: "/xontrol/newsletter-subscribers",
+    icon: ICONS.audience,
+  },
+  {
+    title: "Changelog",
+    url: "/xontrol/changelog",
+    icon: ICONS.analytics,
   },
 ];
 
@@ -168,7 +183,7 @@ export const AdminsideBarBottomItems: DashboardSideBarTypes[] = [
   },
   {
     title: "Generated URL",
-    url: "/dashboard/url",
+    url: "/xontrol/url/newsletter-setting",
     icon: ICONS.world,
   },
 

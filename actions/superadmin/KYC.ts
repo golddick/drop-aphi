@@ -77,9 +77,9 @@ export async function getKycStats() {
   });
 
   // Uncomment this if you want to restrict to admin users only
-  // if (!userInfo || userInfo.role !== "ADMIN") {
-  //   throw new Error("Unauthorized: You must be an admin");
-  // }
+  if (!userInfo || userInfo.role !== "SUPERADMIN") {
+    throw new Error("Unauthorized: You must be an admin");
+  }
 
   // Fetch basic counts
   const pending = await database.kyc.count({ where: { status: "PENDING" } });

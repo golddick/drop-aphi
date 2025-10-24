@@ -1792,6 +1792,9 @@ function ImageCarousel({ images }: { images: string[] }) {
 }
 
 // ------------------ VIDEO PLAYER ------------------
+
+
+
 function VideoPlayer({ videoUrl }: { videoUrl: string }) {
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -1807,22 +1810,48 @@ function VideoPlayer({ videoUrl }: { videoUrl: string }) {
     return url
   }
 
+  const getThumbnailUrl = (url: string) => {
+    if (url.includes("youtube.com/watch?v=")) {
+      const videoId = url.split("v=")[1]?.split("&")[0]
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    }
+    if (url.includes("youtu.be/")) {
+      const videoId = url.split("youtu.be/")[1]?.split("?")[0]
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    }
+    // Default placeholder thumbnail for non-YouTube videos
+    return "/drop-logo.jpg"
+  }
+
+  const isYouTube = videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")
+
   return (
     <div className="relative bg-black rounded-lg overflow-hidden mb-8 group">
       {!isPlaying ? (
-        <div className="w-full h-96 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+        <div className="relative w-full h-96 flex items-center justify-center">
+          <img
+            src={getThumbnailUrl(videoUrl)}
+            alt="Video thumbnail"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40"></div>
           <button
             onClick={() => setIsPlaying(true)}
-            className="bg-yellow-600 hover:bg-yellow-700 p-4 rounded-full transition-all transform group-hover:scale-110"
+            className="z-10 bg-yellow-600 hover:bg-yellow-700 p-4 rounded-full transition-all transform group-hover:scale-110"
             aria-label="Play video"
           >
             <Play className="w-8 h-8 text-white fill-white" />
           </button>
+          {isYouTube && (
+            <div className="absolute bottom-3 left-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">
+              YouTube
+            </div>
+          )}
         </div>
       ) : (
         <iframe
           src={getEmbedUrl(videoUrl)}
-          title="Blog post video"
+          title="Video player"
           className="w-full h-96"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -1831,6 +1860,49 @@ function VideoPlayer({ videoUrl }: { videoUrl: string }) {
     </div>
   )
 }
+
+
+
+
+// function VideoPlayer({ videoUrl }: { videoUrl: string }) {
+//   const [isPlaying, setIsPlaying] = useState(false)
+
+//   const getEmbedUrl = (url: string) => {
+//     if (url.includes("youtube.com/watch?v=")) {
+//       const videoId = url.split("v=")[1]?.split("&")[0]
+//       return `https://www.youtube.com/embed/${videoId}`
+//     }
+//     if (url.includes("youtu.be/")) {
+//       const videoId = url.split("youtu.be/")[1]?.split("?")[0]
+//       return `https://www.youtube.com/embed/${videoId}`
+//     }
+//     return url
+//   }
+
+//   return (
+//     <div className="relative bg-black rounded-lg overflow-hidden mb-8 group">
+//       {!isPlaying ? (
+//         <div className="w-full h-96 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+//           <button
+//             onClick={() => setIsPlaying(true)}
+//             className="bg-yellow-600 hover:bg-yellow-700 p-4 rounded-full transition-all transform group-hover:scale-110"
+//             aria-label="Play video"
+//           >
+//             <Play className="w-8 h-8 text-white fill-white" />
+//           </button>
+//         </div>
+//       ) : (
+//         <iframe
+//           src={getEmbedUrl(videoUrl)}
+//           title="Blog post video"
+//           className="w-full h-96"
+//           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+//           allowFullScreen
+//         />
+//       )}
+//     </div>
+//   )
+// }
 
 // ------------------ MAIN BLOG POST READER ------------------
 export function BlogPostReader({ post, relatedPosts }: BlogPostReaderProps) {

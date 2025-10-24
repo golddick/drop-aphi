@@ -222,7 +222,7 @@ export function KYCDetailsView({ kycData, onEdit, onResubmit, isUpLoading }: KYC
             {kycData.reviewedBy ? (
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-600">Reviewed By</p>
-                <p className="text-sm">{kycData.reviewedBy}</p>
+                <p className="text-sm">{kycData.reviewedBy || 'DROP-APHI TEAM '}</p>
               </div>
             ): (
               <div className="space-y-1">
@@ -254,6 +254,7 @@ export function KYCDetailsView({ kycData, onEdit, onResubmit, isUpLoading }: KYC
                   <p className="text-sm text-green-800 mt-1">
                     Your identity has been successfully verified. You now have access to all platform features.
                   </p>
+                  <p className="text-sm text-red-800 mt-1 capitalize">{kycData.comments}</p>
                 </div>
               </div>
             </div>

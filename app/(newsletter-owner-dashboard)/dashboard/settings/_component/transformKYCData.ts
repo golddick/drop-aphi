@@ -1,4 +1,4 @@
-import { KYCAccountType, KYCStatus } from "@/lib/generated/prisma";
+import { KYCAccountType, KYCStatus } from "@prisma/client";
 
 
 

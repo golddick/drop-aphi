@@ -1,141 +1,3 @@
-// // lib/email/sendPlatformNotification.ts
-
-// import { transporter } from './utils';
-
-// interface SendPlatformNotificationEmailParams {
-//   userEmail: string[];
-//   subject: string;
-//   content: string;
-//   adminEmail: string;
-//   fromApplication: string;
-//   trackOpens?: boolean;
-//   trackClicks?: boolean;
-//   enableUnsubscribe?: boolean;
-// }
-
-// export const sendPlatformNotificationEmail = async (params: SendPlatformNotificationEmailParams) => {
-//   const {
-//     userEmail,
-//     subject,
-//     content,
-//     fromApplication,
-//     adminEmail,
-//     trackOpens = true,
-//     trackClicks = true,
-//     enableUnsubscribe = true,
-//   } = params;
-
-//   const domain = process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://drop-aphi.vercel.app';
-//   const trackingId = `platform_${Date.now()}`;
-
-//   try {
-//     // Validate required fields
-//     if ( !userEmail?.length) {
-//       throw new Error('Missing required fields');
-//     }
-
-//     // Verify SMTP connection
-//     const smtpAvailable = await transporter.verify().catch((err) => {
-//       console.error("SMTP verification failed:", err);
-//       return false;
-//     });
-//     if (!smtpAvailable) throw new Error("Email server unavailable");
-
-//     const results = await Promise.allSettled(
-//       userEmail.map(async (email) => {
-//         try {
-//           let enhancedContent = content;
-
-//             // Update click tracking
-//             enhancedContent = enhancedContent.replace(
-//             /href="([^"]+)"/g,
-//             (_, url) => 
-//                 `href="${domain}/api/platform/track-platform-mail/click?email=${encodeURIComponent(email)}&url=${encodeURIComponent(url)}&tid=${trackingId}"`
-//             );
-
-//             // Update open tracking
-//             enhancedContent += `<img src="${domain}/api/platform/track-platform-mail/open?email=${encodeURIComponent(email)}&tid=${trackingId}" width="1" height="1" style="display:none" />`;
-
-//             // Update unsubscribe link
-//             enhancedContent += `
-//             <div style="text-align:center;margin-top:20px;font-size:12px;color:#666;">
-//                 <p style="margin: 0 0 10px;">
-//                 © 2025 <a href="https://drop-aphi.vercel.app" style="color: #666666; text-decoration: underline;" target="_blank">Drop-aphi</a>. All rights reserved.
-//                 </p>
-//                 ${enableUnsubscribe ? `
-//                 <p style="margin: 0;">
-//                 <a href="${domain}/api/platform/unsubscribe?email=${encodeURIComponent(email)}" 
-//                     style="color: #666666; text-decoration: underline;">
-//                     Unsubscribe from platform updates
-//                 </a>
-//                 </p>
-//                 ` : ''}
-//             </div>
-//             `;
-
-//           const fromName = fromApplication 
-//             ? `${fromApplication.charAt(0).toUpperCase()}${fromApplication.slice(1).toLowerCase()}`
-//             : 'Drop-Aphi';
-
-//           const result = await transporter.sendMail({
-//             from: `${fromName} <${process.env.SMTP_USER}>`,
-//             to: email,
-//             subject: subject,
-//             html: enhancedContent,
-//             headers: { 
-//               'X-Tracking-ID': trackingId,
-//               'X-Platform-Email': 'true',
-//               ...(enableUnsubscribe && { 
-//                 'List-Unsubscribe': `<${domain}/api/platform-unsubscribe?email=${encodeURIComponent(email)}>`
-//               })
-//             }
-//           });
-
-//           return { email, success: true, messageId: result.messageId };
-//         } catch (error) {
-//           console.error(`Failed to send platform email to ${email}:`, error);
-//           return { email, success: false, error };
-//         }
-//       })
-//     );
-
-//     const successful = results.filter(result => 
-//       result.status === 'fulfilled' && result.value.success
-//     ).length;
-
-//     const failed = results.filter(result => 
-//       result.status === 'rejected' || !result.value?.success
-//     );
-
-//     console.log(`[PLATFORM_EMAIL_SENT] Successful: ${successful}, Failed: ${failed.length}`);
-
-//     return {
-//       success: true,
-//       trackingId,
-//       stats: {
-//         total: userEmail.length,
-//         successful,
-//         failed: failed.length,
-//       },
-//     };
-//   } catch (error) {
-//     console.error('[PLATFORM_NOTIFICATION_SEND_ERROR]', error);
-//     return {
-//       success: false,
-//       error: error instanceof Error ? error.message : 'Platform notification send failed',
-//       trackingId,
-//     };
-//   }
-// };
-
-
-
-
-
-
-
-
-
 
 
 
@@ -172,13 +34,19 @@ export const sendPlatformNotificationEmail = async (params: SendPlatformNotifica
     enableUnsubscribe = true,
   } = params;
 
-  const domain = process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://drop-aphi.vercel.app';
-  const trackingId = `platform_${Date.now()}`;
+  const domain = process.env.NEXT_PUBLIC_WEBSITE_URL! || 'https://drop-aphi.vercel.app';
+  const trackingId = `Driop-aphi_platform_${Date.now()}`;
 
   try {
     // Validate required fields
     if (!userEmail?.length) {
-      throw new Error('Missing required fields');
+      throw new Error('Recipient emails are required');
+    }
+    if (!subject?.trim()) {
+      throw new Error('Email subject is required');
+    }
+    if (!content?.trim()) {
+      throw new Error('Email content is required');
     }
 
     // Verify SMTP connection
@@ -229,6 +97,10 @@ export const sendPlatformNotificationEmail = async (params: SendPlatformNotifica
           // Use a more professional from address
           const fromName = "Drop-aphi";
           const fromEmail = process.env.SMTP_USER;
+
+          if (!fromEmail) {
+            throw new Error('SMTP_USER environment variable is not set');
+          }
 
           const mailOptions = {
             from: `"${fromName}" <${fromEmail}>`,
