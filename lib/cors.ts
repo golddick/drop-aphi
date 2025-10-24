@@ -18,7 +18,7 @@ export function withCors(json: any, req: NextRequest, status = 200) {
   }
   
   res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  res.headers.set("Access-Control-Allow-Headers", "Content-Type, xypher-api-key, Authorization");
+  res.headers.set("Access-Control-Allow-Headers", "Content-Type, drop-aphi-key, Authorization");
   res.headers.set("Access-Control-Max-Age", "86400");
   
   return res;
@@ -33,7 +33,7 @@ export function corsOptions(req: NextRequest) {
   // Allow any origin for preflight
   response.headers.set("Access-Control-Allow-Origin", origin || "*");
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, xypher-api-key, Authorization");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, drop-aphi-key, Authorization");
   response.headers.set("Access-Control-Max-Age", "86400");
   
   if (origin) {
