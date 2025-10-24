@@ -61,7 +61,7 @@ export const PLAN_CONFIG = {
   },
   SCALE: {
     monthly: { id: "PLN_21dokhpcgmvofkf", amount: 25000 },
-    yearly: { id: "PLN_k900i8ga01qcdbh", amount: 255000 },
+    yearly: { id: "PLN_k900i8ga01qcdbh", amount: 240000 },
   },
   FREE: {
     monthly: { id: "PLN_free_monthly_id", amount: 0 },
