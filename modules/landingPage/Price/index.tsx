@@ -41,13 +41,16 @@ export default function PricingPage() {
     }
 
     setIsLoading(planId)
+ 
+
+      const currentPath = window.location.pathname;
 
     try {
       const result = await paystackSubscribe({
         planName: planName as "LAUNCH" | "SCALE",
         userId: user.userId,
         billingCycle: billingPeriod,
-        redirectPath: "/dashboard/settings?tab=subscription"
+        redirectPath: currentPath
       })
 
       // Handle KYC required case

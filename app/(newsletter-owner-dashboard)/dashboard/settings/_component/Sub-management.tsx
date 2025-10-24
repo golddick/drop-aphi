@@ -126,11 +126,13 @@ export function SubscriptionSettings() {
         }
         return;
       }
+        const currentPath = window.location.pathname;
 
       const result = await paystackSubscribe({
         planName: plan,
         userId: user.userId,
         billingCycle,
+        redirectPath:currentPath
       });
 
       // Handle KYC required case

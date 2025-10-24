@@ -261,7 +261,7 @@ export const paystackSubscribe = async ({
     }
 
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL;
+    const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL!;
 
     if (!paystackSecret || !websiteUrl) {
       return {
