@@ -19,7 +19,7 @@ import { useAuthUser } from "@/lib/auth/getClientAuth"
 import { toast } from "sonner"
 import Loader from "@/components/_component/Loader"
 
-type SubscriptionData = {
+type SubscriptionData = { 
   plan: Plan
   subscriptionStatus: string
   currentPeriodEnd: Date | null
@@ -129,7 +129,7 @@ export function SubscriptionSettings() {
 
       const result = await paystackSubscribe({
         planName: plan,
-        userId: user.id,
+        userId: user.userId,
         billingCycle,
       });
 
@@ -331,7 +331,7 @@ export function SubscriptionSettings() {
             <Label htmlFor="billing-toggle" className="text-sm sm:text-base">
               Yearly{" "}
               <Badge variant="secondary" className="ml-1">
-                Save 17%
+                Save 20%
               </Badge>
             </Label>
           </div>

@@ -7,40 +7,61 @@ export interface PlanLimits {
   
 
   
-  export  const planDetails = {
+  // export  const planDetails = {
+  //   FREE: {
+  //     amount: 0,
+  //     subscriberLimit: 500,
+  //     emailLimit: 20,
+  //     blogPostLimit: 10,
+  //     aiGenerationLimit: 5,
+  //   },
+  //   LAUNCH: {
+  //     amount: 2900, // in cents/kobo
+  //     subscriberLimit: 5000,
+  //     emailLimit: 50,
+  //     blogPostLimit: 50,
+  //     aiGenerationLimit: 20,
+  //   },
+  //   SCALE: {
+  //     amount: 9900, // in cents/kobo
+  //     subscriberLimit: 20000,
+  //     emailLimit: 100,
+  //     blogPostLimit: 200,
+  //     aiGenerationLimit: 100,
+  //   },
+  // } as const;
+
+
+export  const PLAN_LIMITS = {
     FREE: {
-      amount: 0,
       subscriberLimit: 500,
       emailLimit: 20,
-      blogPostLimit: 10,
+      blogPostLimit: 5,
       aiGenerationLimit: 5,
     },
     LAUNCH: {
-      amount: 2900, // in cents/kobo
-      subscriberLimit: 5000,
+      subscriberLimit: 1000,
       emailLimit: 50,
-      blogPostLimit: 50,
-      aiGenerationLimit: 20,
+      blogPostLimit: 10,
+      aiGenerationLimit: 10,
     },
     SCALE: {
-      amount: 9900, // in cents/kobo
-      subscriberLimit: 20000,
+      subscriberLimit: 5000,
       emailLimit: 100,
-      blogPostLimit: 200,
-      aiGenerationLimit: 100,
+      blogPostLimit: 20,
+      aiGenerationLimit: 20,
     },
-  }
-
+  } as const;
 
 
 export const PLAN_CONFIG = {
   LAUNCH: {
-    monthly: { id: "PLN_xpxme65ldog950p", amount: 15000, name:"LAUNCH" },
-    yearly: { id: "PLN_zpaqmox70eunvd9", amount: 540000 },
+    monthly: { id: "PLN_rvpduy0rmjjt573", amount: 10000, name:"LAUNCH" },
+    yearly: { id: "PLN_rgstsf6wp9oknj8", amount: 96000, name:"LAUNCH" },
   },
   SCALE: {
-    monthly: { id: "PLN_4idp8h4m8ptak6k", amount: 50000 },
-    yearly: { id: "PLN_l1ck8bvf49k9nhx", amount: 1000000 },
+    monthly: { id: "PLN_21dokhpcgmvofkf", amount: 25000 },
+    yearly: { id: "PLN_k900i8ga01qcdbh", amount: 255000 },
   },
   FREE: {
     monthly: { id: "PLN_free_monthly_id", amount: 0 },
@@ -59,7 +80,7 @@ export const availablePlans = [
     features: [
       "Up to 500 subscribers",
       "Send up to 20 mails",
-      "Post up to 10 Blog content ",
+      "Post up to 5 Blog content ",
       "use AI to generaate content",
       " Dev key free for first tym user for 1 month ",
       "Custom subscription page",
@@ -77,9 +98,9 @@ export const availablePlans = [
     price: { monthly: PLAN_CONFIG.LAUNCH.monthly.amount, yearly: PLAN_CONFIG.LAUNCH.yearly.amount },
     features: [
       "Everything in FREE plus:",
-      "Up to 5,000 subscribers",
+      "Up to 1,000 subscribers",
       "Send up to 50 emails",
-      "50 blog posts",
+      "10 blog posts",
       "AI-powered content generation",
       "Custom subscription page",
       "Dev API access",
@@ -96,9 +117,9 @@ export const availablePlans = [
     price: { monthly: PLAN_CONFIG.SCALE.monthly.amount, yearly: PLAN_CONFIG.SCALE.yearly.amount },
     features: [
       "Everything in LAUNCH plus:",
-      "Up to 10,000 subscribers",
-      "Send 50 emails",
-      "200 blog posts",
+      "Up to 5,000 subscribers",
+      "Send up to 100 emails",
+      "20 blog posts",
       "AI-powered content generation",
       "Custom subscription page",
       "Advanced analytics",

@@ -213,7 +213,7 @@ model User {
   failedAttempts               Int                                @default(0)
   subscriberLimit              Int                                @default(500)
   emailLimit                   Int                                @default(20)
-  blogPostLimit                Int                                @default(10)
+  blogPostLimit                Int                                @default(5)
   aiGenerationLimit            Int                                @default(5)
   termsAndConditionsAccepted   Boolean                            @default(false)
   approvedKYC                  Boolean                            @default(false)
@@ -282,6 +282,8 @@ model Invoice {
   amount      Int
   status      String
   invoiceUrl  String
+  plan        String
+  billingCycle String
   date        DateTime @default(now())
   externalId  String?
   user        User     @relation(fields: [userId], references: [userId])
